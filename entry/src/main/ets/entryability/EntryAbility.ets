@@ -113,7 +113,15 @@ export default class EntryAbility extends UIAbility {
     })
   }
 
+  private async loadDefaultPref(appPref: preference.Preferences) {
+    await appPref.put(appOption.portMappingEnabled, true);
+    if (await appPref.get(appOption.portMapping, '[]') === '[]') {
+      await appPref.put(appOption.portMapping, [{ guest: 4533, host: 4533 } as PortMapping])
+    }
+  }
   private async loadPreferences(appPref: preference.Preferences) {
+    // TODO: 测试
+    await this.loadDefaultPref(appPref);
     const vmCpuCount = await appPref.get(appOption.cpuCountName, 1);
     const vmMemSize = await appPref.get(appOption.memSizeName, 512);
     const keepScreenOn = await appPref.get(appOption.keepScreenOn, false) as boolean;
