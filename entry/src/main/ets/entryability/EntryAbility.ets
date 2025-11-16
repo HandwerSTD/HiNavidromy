@@ -116,7 +116,7 @@ export default class EntryAbility extends UIAbility {
   private async loadDefaultPref(appPref: preference.Preferences) {
     await appPref.put(appOption.portMappingEnabled, true);
     if (await appPref.get(appOption.portMapping, '[]') === '[]') {
-      await appPref.put(appOption.portMapping, [{ guest: 4533, host: 4533 } as PortMapping])
+      await appPref.put(appOption.portMapping, JSON.stringify([{ guest: 4533, host: 4533 } as PortMapping]))
     }
   }
   private async loadPreferences(appPref: preference.Preferences) {
@@ -161,6 +161,11 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate(appOption.sharedGuest, sharedGuest)
     AppStorage.setOrCreate(appOption.sharedHost, sharedHost)
     AppStorage.setOrCreate(appOption.rootFilesystem, rootFilesystem)
+
+    // create music folder
+    if (!fs.accessSync(sharedHost + '/music/', fs.AccessModeType.EXIST)) {
+      fs.mkdirSync(sharedHost + '/music/')
+    }
 
     AppStorage.setOrCreate(appOption.vmBaseDir, bundleVmDir)
     AppStorage.setOrCreate(appOption.kernel, bundleVmDir + '/kernel_aarch64')
