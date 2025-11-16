@@ -25,7 +25,7 @@
 #undef LOG_DOMAIN
 #undef LOG_TAG
 #define LOG_DOMAIN 0x3300
-#define LOG_TAG "HiSH"
+#define LOG_TAG "HiNavidromy"
 
 struct data_buffer {
     char *buf;

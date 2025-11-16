@@ -1,6 +1,6 @@
 {
   "modelVersion": "5.0.1",
-  "description": "HiSH App",
+  "description": "HiNavidromy App",
   "dependencies": {
     "@ohos/commons-compress": "^2.0.6",
     "@tencent/mmkv": "^2.2.4",
