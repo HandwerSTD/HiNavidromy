@@ -1,6 +1,6 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { window, KeyboardAvoidMode } from '@kit.ArkUI';
+import { window, KeyboardAvoidMode, promptAction } from '@kit.ArkUI';
 import common from '@ohos.app.ability.common';
 import preference from '@ohos.data.preferences';
 import fs from '@ohos.file.fs';
@@ -16,6 +16,9 @@ import {
   TarArchiveInputStream
 } from '@ohos/commons-compress';
 import { startVm } from '../lib/startVm';
+import { PermissionUtil } from '@pura/harmony-utils';
+import { BackgroundTaskManager } from '../common/utils/BackgroundTaskManager';
+import { geoLocationManager } from '@kit.LocationKit';
 
 const DOMAIN = 0x0000;
 
@@ -54,6 +57,7 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
 
       let mainWindow = windowStage.getMainWindowSync();
+      this.startSimulateBg()
       mainWindow.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE);
       mainWindow.setWindowKeepScreenOn(AppStorage.get(appOption.keepScreenOn) as boolean);
 
@@ -120,18 +124,41 @@ export default class EntryAbility extends UIAbility {
     }
   }
   private async loadPreferences(appPref: preference.Preferences) {
-    // TODO: 测试
     await this.loadDefaultPref(appPref);
     const vmCpuCount = await appPref.get(appOption.cpuCountName, 1);
     const vmMemSize = await appPref.get(appOption.memSizeName, 512);
     const keepScreenOn = await appPref.get(appOption.keepScreenOn, false) as boolean;
     const portMappingEnabled = await appPref.get(appOption.portMappingEnabled, false) as boolean;
     const portMapping = JSON.parse(await appPref.get(appOption.portMapping, '[]') as string) as PortMapping[];
+    const simulateBg = await appPref.get(appOption.simulateBg, false) as boolean;
     AppStorage.setOrCreate(appOption.cpuCountName, vmCpuCount);
     AppStorage.setOrCreate(appOption.memSizeName, vmMemSize);
     AppStorage.setOrCreate(appOption.keepScreenOn, keepScreenOn);
     AppStorage.setOrCreate(appOption.portMappingEnabled, portMappingEnabled);
     AppStorage.setOrCreate(appOption.portMapping, portMapping);
+    AppStorage.setOrCreate(appOption.simulateBg, simulateBg)
+  }
+  private async startSimulateBg() {
+    if (AppStorage.get<boolean>(appOption.simulateBg)) {
+      PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
+        .then((res) => {
+          if (!res) {
+            promptAction.openToast({
+              message: '请授予权限'
+            })
+            return;
+          }
+          geoLocationManager.on("locationChange", {
+            interval: 10,
+            locationScenario: geoLocationManager.PowerConsumptionScenario.NO_POWER_CONSUMPTION
+          }, () => {})
+          BackgroundTaskManager.startContinuousTask(this.context as common.UIAbilityContext)
+          promptAction.openToast({
+            message: '后台模拟启动成功'
+          })
+        })
+
+    }
   }
 
   private async extractKernelAndRootFilesystem(appContext: common.ApplicationContext,
@@ -163,9 +190,9 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate(appOption.rootFilesystem, rootFilesystem)
 
     // create music folder
-    if (!fs.accessSync(sharedHost + '/music/', fs.AccessModeType.EXIST)) {
-      fs.mkdirSync(sharedHost + '/music/')
-    }
+    // if (!fs.accessSync(sharedHost + '/music/', fs.AccessModeType.EXIST)) {
+    //   fs.mkdirSync(sharedHost + '/music/')
+    // }
 
     AppStorage.setOrCreate(appOption.vmBaseDir, bundleVmDir)
     AppStorage.setOrCreate(appOption.kernel, bundleVmDir + '/kernel_aarch64')

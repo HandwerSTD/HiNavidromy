@@ -40,7 +40,7 @@ export class BackgroundTaskManager {
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj) => {
       try {
         backgroundTaskManager.startBackgroundRunning(context,
-          backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
+          backgroundTaskManager.BackgroundMode.LOCATION, wantAgentObj).then(() => {
           Logger.info(TAG, 'startBackgroundRunning succeeded');
         }).catch((err: BusinessError) => {
           Logger.info(TAG, `startBackgroundRunning failed Cause:  ${JSON.stringify(err)}`);

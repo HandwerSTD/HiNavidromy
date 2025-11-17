@@ -1,4 +1,4 @@
-import { CustomContentDialog, window } from '@kit.ArkUI';
+import { CustomContentDialog, promptAction, window } from '@kit.ArkUI';
 import { bundleManager, common, Want } from '@kit.AbilityKit';
 import preference from '@ohos.data.preferences';
 import appOption from '../model/appOption';
@@ -6,6 +6,9 @@ import { OpenSourceContent } from './OpenSourceContent';
 import { BlockTitle, LinkItem, SettingBlockStyle, SettingItem } from './SettingsBase';
 import { fileIo as fs } from '@kit.CoreFileKit'
 import { ListFileOptions } from '@kit.CoreFileKit';
+import { BackgroundTaskManager } from '../common/utils/BackgroundTaskManager';
+import { geoLocationManager } from '@kit.LocationKit';
+import { PermissionUtil } from '@pura/harmony-utils';
 
 const cpuOptions: number[] = [1, 2, 4, 6, 8, 10, 16, 24, 32]
 const memOptions: number[] = [512, 1024, 2 * 1024, 4 * 1024, 6 * 1024, 8 * 1024, 12 * 1024, 16 * 1024]
@@ -63,6 +66,8 @@ export default struct SettingsContent {
   @Watch('saveVmCpuCount') @StorageProp(appOption.cpuCountName) vmCpuCount: number = 1
   @Watch('saveVmMemSize') @StorageProp(appOption.memSizeName) vmMemSize: number = 512
   @Watch('saveKeepScreenOn') @StorageProp(appOption.keepScreenOn) keepScreenOn: boolean = false
+  @Watch('saveSimulateBg') @StorageProp(appOption.simulateBg) simulateBg: boolean = false
+
   @StorageProp('bundleInfo') bundleInfo?: bundleManager.BundleInfo = undefined
   @StorageProp('versionCode') versionCode: number = 0
   @State cpuOptions: SelectOption[] = []
@@ -131,6 +136,33 @@ export default struct SettingsContent {
     }
   }
 
+  saveSimulateBg() {
+    this.preferences!.put(appOption.simulateBg, this.simulateBg)
+    this.preferences!.flush()
+    if (this.simulateBg) {
+      PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
+        .then((res) => {
+          if (!res) {
+            promptAction.openToast({
+              message: '请授予权限'
+            })
+            return;
+          }
+          geoLocationManager.on("locationChange", {
+            interval: 10,
+            locationScenario: geoLocationManager.PowerConsumptionScenario.NO_POWER_CONSUMPTION
+          }, () => {})
+          BackgroundTaskManager.startContinuousTask(this.getUIContext().getHostContext()! as common.UIAbilityContext)
+          promptAction.openToast({
+            message: '启动成功'
+          })
+        })
+
+    } else {
+      BackgroundTaskManager.stopContinuousTask(this.getUIContext().getHostContext()! as common.UIAbilityContext)
+    }
+  }
+
   @Builder
   private cpuSetting() {
     Select(this.cpuOptions)
@@ -153,6 +185,14 @@ export default struct SettingsContent {
       .select(this.keepScreenOn)
       .onChange((value: boolean) => {
         AppStorage.setOrCreate(appOption.keepScreenOn, value)
+      })
+  }
+  @Builder
+  private simulateBackground() {
+    Checkbox()
+      .select(this.simulateBg)
+      .onChange((value: boolean) => {
+        AppStorage.setOrCreate(appOption.simulateBg, value)
       })
   }
 
@@ -201,6 +241,19 @@ export default struct SettingsContent {
           }
           .onClick(() => {
             AppStorage.setOrCreate(appOption.keepScreenOn, !this.keepScreenOn)
+          })
+          .attributeModifier(this.blockStyle)
+          Column() {
+            SettingItem({
+              title: '模拟后台运行',
+              subTitle: '使用定位权限模拟后台运行',
+              content: () => {
+                this.simulateBackground()
+              }
+            })
+          }
+          .onClick(() => {
+            AppStorage.setOrCreate(appOption.simulateBg, !this.simulateBg)
           })
           .attributeModifier(this.blockStyle)
 
