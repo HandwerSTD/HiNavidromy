@@ -309,7 +309,7 @@ export struct SharedFolderContent {
     let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
     let options = new picker.DocumentSelectOptions();
-    options.maxSelectNumber = 1;
+    options.maxSelectNumber = 500;
 
     let documentPicker = new picker.DocumentViewPicker(context);
     let uris = await documentPicker.select(options);
@@ -318,18 +318,21 @@ export struct SharedFolderContent {
       return
     }
 
-    const srcUri = uris[0]
-    const destPath = [...this.current, decodeURI(srcUri.split('/').reverse()[0])].join('/')
-
     this.importProgress.open()
-    try {
-      await copyFile(srcUri, destPath);
-      this.refreshFileList()
-    } catch (e) {
-      console.log('error copy file', srcUri, destPath, e)
-    } finally {
-      this.importProgress.close()
+    for (let i = 0; i < uris.length; ++i) {
+      const srcUri = uris[i]
+      const destPath = [...this.current, decodeURI(srcUri.split('/').reverse()[0])].join('/')
+      try {
+        await copyFile(srcUri, destPath);
+        this.refreshFileList()
+        this.promptAction.openToast({
+          message: `完成 (${i+1}/${uris.length})`
+        })
+      } catch (e) {
+        console.log('error copy file', srcUri, destPath, e)
+      }
     }
+    this.importProgress.close()
   }
 
   async createFolderToCurrent() {
