@@ -1,10 +1,12 @@
+import { CommonListItem } from "./component_library/CommonListItem"
+
 @Component
 export struct BlockTitle {
   content?: string | Resource
 
   build() {
     Text(this.content)
-      .margin({ bottom: 10, left: 20 })
+      .margin({ left: 20 })
       .width('100%')
   }
 }
@@ -40,27 +42,15 @@ export struct SettingItem {
   @BuilderParam content?: () => void
 
   build() {
-
-    Row() {
-      ItemTitle({
-        title: this.title,
-        subTitle: this.subTitle
-      })
-
-      if (this.content) {
-        this.content()
-      }
-      if (this.icon) {
-        SymbolGlyph(this.icon)
-          .fontColor([$r('sys.color.icon_secondary')])
-          .fontSize('24vp')
-      }
-    }
-    .alignItems(VerticalAlign.Center)
-    .width('100%')
-    .height(56)
-    .clickEffect({ level: ClickEffectLevel.MIDDLE })
-    .padding({ left: $r('sys.float.padding_level6'), right: $r('sys.float.padding_level6') })
+    CommonListItem({
+      icon: this.icon,
+      title: this.title,
+      subtitle: this.subTitle,
+      isCompose: true,
+      trailing: this.content ? () => {
+        this.content!()
+      } : undefined
+    })
   }
 }
 

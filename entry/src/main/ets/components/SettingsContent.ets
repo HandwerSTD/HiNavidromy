@@ -9,6 +9,7 @@ import { ListFileOptions } from '@kit.CoreFileKit';
 import { BackgroundTaskManager } from '../common/utils/BackgroundTaskManager';
 import { geoLocationManager } from '@kit.LocationKit';
 import { PermissionUtil } from '@pura/harmony-utils';
+import { CommonItemContainer } from './component_library/CommonListItem';
 
 const cpuOptions: number[] = [1, 2, 4, 6, 8, 10, 16, 24, 32]
 const memOptions: number[] = [512, 1024, 2 * 1024, 4 * 1024, 6 * 1024, 8 * 1024, 12 * 1024, 16 * 1024]
@@ -199,10 +200,10 @@ export default struct SettingsContent {
   build() {
     Column() {
       Scroll() {
-        Column() {
+        Column({space: 12}) {
 
           BlockTitle({ content: $r("app.string.setting_block_system") })
-          Column() {
+          CommonItemContainer() {
             SettingItem({
               title: $r('app.string.setting_cpu'),
               subTitle: $r('app.string.setting_cpu_desc'),
@@ -213,7 +214,7 @@ export default struct SettingsContent {
 
             SettingItem({
               title: $r('app.string.setting_mem_size'),
-              subTitle: $r('app.string.setting_mem_size_desc'),
+              subTitle: '设置内存大小 (MB)，推荐 2048 MB',
               content: () => {
                 this.memorySetting()
               }
@@ -227,10 +228,9 @@ export default struct SettingsContent {
               this.openResetLinuxDialog()
             })
           }
-          .attributeModifier(this.blockStyle)
 
           BlockTitle({ content: $r("app.string.setting_block_display") })
-          Column() {
+          CommonItemContainer() {
             SettingItem({
               title: $r('app.string.setting_keep_screen_on'),
               subTitle: $r('app.string.setting_keep_screen_on_desc'),
@@ -238,12 +238,9 @@ export default struct SettingsContent {
                 this.keepScreenSetting()
               }
             })
-          }
-          .onClick(() => {
-            AppStorage.setOrCreate(appOption.keepScreenOn, !this.keepScreenOn)
-          })
-          .attributeModifier(this.blockStyle)
-          Column() {
+              .onClick(() => {
+                AppStorage.setOrCreate(appOption.keepScreenOn, !this.keepScreenOn)
+              })
             SettingItem({
               title: '模拟后台运行',
               subTitle: '使用定位权限模拟后台运行',
@@ -251,19 +248,18 @@ export default struct SettingsContent {
                 this.simulateBackground()
               }
             })
+              .onClick(() => {
+                AppStorage.setOrCreate(appOption.simulateBg, !this.simulateBg)
+              })
           }
-          .onClick(() => {
-            AppStorage.setOrCreate(appOption.simulateBg, !this.simulateBg)
-          })
-          .attributeModifier(this.blockStyle)
 
           BlockTitle({ content: $r('app.string.setting_block_about') })
-          Column() {
+          CommonItemContainer() {
             LinkItem({
               icon: $r('sys.symbol.house'),
               title: $r('app.string.code_repository'),
               click: () => {
-                this.toWebBrowser('https://github.com/harmoninux/hish')
+                this.toWebBrowser('https://github.com/HandwerSTD/hinavidromy')
               }
             })
 
@@ -283,9 +279,8 @@ export default struct SettingsContent {
               }
             })
           }
-          .attributeModifier(this.blockStyle)
         }
-        .margin(10)
+        .margin(12)
       }
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Auto)

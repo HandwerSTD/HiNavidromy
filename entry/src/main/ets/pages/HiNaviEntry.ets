@@ -1,6 +1,6 @@
 import { SpinKit } from '@pura/harmony-dialog'
 import GlobalStore from '../common/statemgmt/GlobalStore'
-import { NavidromeServerUtils } from '../common/utils/NavidromeServerUtils'
+import { NavidromeServerUtils, VMUtils } from '../common/utils/NavidromeServerUtils'
 import { CommonListItem } from '../components/component_library/CommonListItem'
 import SettingsContent from '../components/SettingsContent'
 import { SharedFolderContent } from '../components/SharedFolderContent'
@@ -14,8 +14,19 @@ import { Index } from './Index'
 struct HiNaviEntry {
   @Local showTerminal: boolean = true
 
+  scroller = new Scroller()
+
   aboutToAppear(): void {
     NavidromeServerUtils.checkConnectionOnStart()
+      .catch(() => {
+        this.getUIContext().showAlertDialog({
+          title: '服务器连接超时',
+          message: '无法连接到位于 localhost:4533 的服务器，可能有以下原因：\n' +
+            '1. 上次虚拟机退出时未正常关机\n' +
+            '2. 向外部端口映射失败或 4533 端口被占用\n' +
+            '3. 虚拟机内服务器启动失败',
+        })
+      })
   }
 
   @Builder PageMap(name: string) {
@@ -60,11 +71,12 @@ struct HiNaviEntry {
   }
 
   @Builder MainList() {
-    List({space: 12}) {
+    List({space: 12, scroller: this.scroller}) {
       ListItem() {
         CommonListItem({
           icon: $r('sys.symbol.planets'),
-          title: '服务器状态'
+          title: '服务器状态',
+          subtitle: GlobalStore.isServerOnline ? '已连接' : '连接中'
         }) {
           this.UpStatus()
         }
@@ -93,6 +105,27 @@ struct HiNaviEntry {
         })
           .onClick(() => {
             GlobalStore.pageStack.pushPathByName('Settings',[])
+          })
+      }
+      ListItem() {
+        Button('正常关机').width('100%').backgroundColor($r('sys.color.warning'))
+          .onClick(() => {
+            this.getUIContext().showAlertDialog({
+              message: '确定要关机吗？',
+              primaryButton: {
+                value: $r('sys.string.general_confirm'),
+                fontColor: $r('sys.color.warning'),
+                action: () => {
+                  this.showTerminal = true
+                  VMUtils.breakAndExecuteCommand('poweroff')
+                }
+              },
+              secondaryButton: {
+                value: $r('sys.string.general_cancel'),
+                // fontColor: $r('sys.color.warning'),
+                action: () => {}
+              }
+            })
           })
       }
       ListItem() {

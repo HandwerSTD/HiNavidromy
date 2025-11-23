@@ -75,16 +75,12 @@ export struct CommonListItem {
 @ComponentV2
 export struct CommonItemContainer {
   @Param spc: number = 0
-  @Param lightUpContent: boolean = true
   @BuilderParam child: () => void
 
   build() {
     Column({space: this.spc}) {
       this.child()
-    }.backgroundColor($r('sys.color.ohos_id_list_background_color'))
+    }.backgroundColor($r('sys.color.ohos_fa_list_card_bg'))
     .borderRadius(20)
-    .visualEffect(new hdsEffect.HdsEffectBuilder().pointLight({
-      illuminatedType: this.lightUpContent ? hdsEffect.PointLightIlluminatedType.BORDER_CONTENT : hdsEffect.PointLightIlluminatedType.BORDER
-    }).buildEffect())
   }
 }

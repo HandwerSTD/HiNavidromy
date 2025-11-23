@@ -7,6 +7,7 @@ import { pasteboard } from '@kit.BasicServicesKit'
 import validateFolderName from '../lib/validateFolderName'
 import { util } from "@kit.ArkTS";
 import appOption from '../model/appOption';
+import { VMUtils } from '../common/utils/NavidromeServerUtils';
 
 enum Type {
   Folder = 0,
@@ -344,6 +345,7 @@ export struct SharedFolderContent {
       }
     }
     this.importProgress.close()
+    VMUtils.suspendAndExecuteCommand('chmod -R o+rwx /mnt/share')
   }
 
   async createFolderToCurrent() {

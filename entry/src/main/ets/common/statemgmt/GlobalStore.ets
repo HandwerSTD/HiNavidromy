@@ -2,6 +2,7 @@ import { WindowAvoidanceData } from "../utils/WindowUtil"
 import { OuterWantDataModel } from "./OuterWantDataModel"
 import { PrefDataModel } from "./PreferenceDataModel"
 import { common } from "@kit.AbilityKit"
+import { ServerLoadStatus } from "../utils/NavidromeServerUtils"
 
 
 @ObservedV2
@@ -42,9 +43,13 @@ class GlobalStore {
 
   @Trace isFirstOpenFinished: boolean = true
 
-  @Trace isServerOnline: boolean = false
+  @Trace serverStatus: ServerLoadStatus = ServerLoadStatus.LOADING
 
   contextFaker?: common.UIAbilityContext
+
+  get isServerOnline() {
+    return this.serverStatus === ServerLoadStatus.SUCCESS
+  }
 }
 
 export default GlobalStore.instance as GlobalStore
