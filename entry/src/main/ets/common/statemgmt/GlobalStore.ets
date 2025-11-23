@@ -16,6 +16,7 @@ class GlobalStore {
     return GlobalStore._instance
   }
 
+  pageStack: NavPathStack = new NavPathStack()
 
   @Trace gotUpdateDeviceId?: string
 
@@ -41,8 +42,9 @@ class GlobalStore {
 
   @Trace isFirstOpenFinished: boolean = true
 
-  globalSnack?: Object
+  @Trace isServerOnline: boolean = false
+
   contextFaker?: common.UIAbilityContext
 }
 
-export default GlobalStore.instance
+export default GlobalStore.instance as GlobalStore

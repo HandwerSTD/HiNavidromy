@@ -223,6 +223,10 @@
     {
       "name": "fre_used_port_duplicated",
       "value": "Conflict between %s and %d:%d"
+    },
+    {
+      "name": "import_file_to_music",
+      "value": "导入到音乐库"
     }
   ]
 }

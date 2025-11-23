@@ -49,7 +49,7 @@ export default class EntryAbility extends UIAbility {
       await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
     AppStorage.setOrCreate('bundleInfo', bundleInfo)
 
-    windowStage.loadContent('pages/Index', (err) => {
+    windowStage.loadContent('pages/HiNaviEntry', (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;

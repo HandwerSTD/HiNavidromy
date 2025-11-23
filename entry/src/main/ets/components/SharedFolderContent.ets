@@ -6,6 +6,7 @@ import { CustomContentDialog, LoadingDialog, PromptAction } from "@kit.ArkUI";
 import { pasteboard } from '@kit.BasicServicesKit'
 import validateFolderName from '../lib/validateFolderName'
 import { util } from "@kit.ArkTS";
+import appOption from '../model/appOption';
 
 enum Type {
   Folder = 0,
@@ -21,13 +22,13 @@ interface Entry {
   detail: string
 }
 
-@Component
+@ComponentV2
 export struct SharedFolderContent {
-  @Require @Prop host: string
-  @Require @Prop guest: string
-  @State files: Entry[] = []
-  @State current: string[] = []
-  @State tempFolderName: string = ''
+  @Local host: string = ''
+  @Local guest: string = ''
+  @Local files: Entry[] = []
+  @Local current: string[] = []
+  @Local tempFolderName: string = ''
   importProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
       content: $r('app.string.importing_file_to_shared_folder'),
@@ -51,6 +52,8 @@ export struct SharedFolderContent {
   private promptAction: PromptAction = this.uiContext.getPromptAction();
 
   async aboutToAppear() {
+    this.host = AppStorage.get(appOption.sharedHost) as string
+    this.guest = AppStorage.get(appOption.sharedGuest) as string
     this.current = [this.host];
     await this.refreshFileList();
   }
@@ -248,6 +251,11 @@ export struct SharedFolderContent {
             action: () => {
               this.importFileToCurrent()
             }
+          }, {
+            value: $r('app.string.import_file_to_music'),
+            action: () => {
+              this.importFileToCurrent(true)
+            }
           }])
       }
       .height(56)
@@ -305,7 +313,7 @@ export struct SharedFolderContent {
     }
   }
 
-  async importFileToCurrent() {
+  async importFileToCurrent(forceMusicFolder?: boolean) {
     let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
     let options = new picker.DocumentSelectOptions();
@@ -321,7 +329,10 @@ export struct SharedFolderContent {
     this.importProgress.open()
     for (let i = 0; i < uris.length; ++i) {
       const srcUri = uris[i]
-      const destPath = [...this.current, decodeURI(srcUri.split('/').reverse()[0])].join('/')
+      let destPath = [...this.current, decodeURI(srcUri.split('/').reverse()[0])].join('/')
+      if (forceMusicFolder) {
+        destPath = [this.host, 'music', decodeURI(srcUri.split('/').reverse()[0])].join('/')
+      }
       try {
         await copyFile(srcUri, destPath);
         this.refreshFileList()

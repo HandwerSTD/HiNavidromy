@@ -10,8 +10,6 @@ import { util } from "@kit.ArkTS";
 
 @Component
 struct PcIndex {
-  @StorageProp(appOption.sharedHost) sharedHost: string = ''
-  @StorageProp(appOption.sharedGuest) sharedGuest: string = ''
   private appContext: common.ApplicationContext =
     (this.getUIContext().getHostContext() as common.UIAbilityContext).getApplicationContext()
   settingController: CustomDialogController = new CustomDialogController({
@@ -39,14 +37,6 @@ struct PcIndex {
       }
     })
   })
-  sharedFolderController: CustomDialogController = new CustomDialogController({
-    builder: CustomContentDialog({
-      primaryTitle: $r('app.string.setting_shared_folder'),
-      contentBuilder: () => {
-        this.buildSharedFolder();
-      }
-    })
-  })
 
   build() {
     Column() {
@@ -68,9 +58,6 @@ struct PcIndex {
             .margin({ right: 10 })
             .borderRadius(4)
             .hoverEffect(HoverEffect.Highlight)
-            .onClick(() => {
-              this.sharedFolderController.open()
-            })
           Image($r('app.media.reverse_order'))
             .width(28)
             .aspectRatio(1)
@@ -115,20 +102,10 @@ struct PcIndex {
   buildPortMapping() {
     PortMappingContent()
   }
-
-  @Builder
-  buildSharedFolder() {
-    SharedFolderContent({
-      host: this.sharedHost,
-      guest: this.sharedGuest
-    })
-  }
 }
 
 @Component
 struct PhoneOrTablet {
-  @StorageProp(appOption.sharedHost) sharedHost: string = ''
-  @StorageProp(appOption.sharedGuest) sharedGuest: string = ''
   @State currentIndex: number = 0;
   private tabsController: TabsController = new TabsController();
   private appContext: common.ApplicationContext =
@@ -168,17 +145,9 @@ struct PhoneOrTablet {
       .tabBar(this.tabBuilder($r('app.string.shell'), 0, $r('sys.symbol.house')))
 
       TabContent() {
-        SharedFolderContent({
-          host: this.sharedHost,
-          guest: this.sharedGuest
-        })
-      }
-      .tabBar(this.tabBuilder($r('app.string.setting_shared_folder'), 1, $r('sys.symbol.folder')))
-
-      TabContent() {
         PortMappingContent()
       }
-      .tabBar(this.tabBuilder($r('app.string.setting_port_mapping'), 2, $r('sys.symbol.reverse_order')))
+      .tabBar(this.tabBuilder($r('app.string.setting_port_mapping'), 1, $r('sys.symbol.reverse_order')))
 
       TabContent() {
         Column() {
@@ -192,7 +161,7 @@ struct PhoneOrTablet {
         .width('100%')
         .height('100%')
       }
-      .tabBar(this.tabBuilder($r('app.string.Setting_title'), 3, $r('sys.symbol.gearshape')))
+      .tabBar(this.tabBuilder($r('app.string.Setting_title'), 2, $r('sys.symbol.gearshape')))
     }
     .width('100%')
     .barHeight(52)
@@ -205,7 +174,7 @@ struct PhoneOrTablet {
 
 @Entry
 @Component
-struct Index {
+export struct Index {
   isPc: boolean = deviceInfo.deviceType === '2in1'
   @StorageProp(appOption.use9pRootFs) use9pRootFs: boolean = false
   private uiContext: UIContext = this.getUIContext();
