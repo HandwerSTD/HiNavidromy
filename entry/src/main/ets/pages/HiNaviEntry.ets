@@ -1,6 +1,6 @@
 import { SpinKit } from '@pura/harmony-dialog'
 import GlobalStore from '../common/statemgmt/GlobalStore'
-import { NavidromeServerUtils, VMUtils } from '../common/utils/NavidromeServerUtils'
+import { NavidromeServerUtils, ServerLoadStatus, VMUtils } from '../common/utils/NavidromeServerUtils'
 import { CommonListItem } from '../components/component_library/CommonListItem'
 import SettingsContent from '../components/SettingsContent'
 import { SharedFolderContent } from '../components/SharedFolderContent'
@@ -19,13 +19,8 @@ struct HiNaviEntry {
   aboutToAppear(): void {
     NavidromeServerUtils.checkConnectionOnStart()
       .catch(() => {
-        this.getUIContext().showAlertDialog({
-          title: '服务器连接超时',
-          message: '无法连接到位于 localhost:4533 的服务器，可能有以下原因：\n' +
-            '1. 上次虚拟机退出时未正常关机\n' +
-            '2. 向外部端口映射失败或 4533 端口被占用\n' +
-            '3. 虚拟机内服务器启动失败',
-        })
+        GlobalStore.serverStatus = ServerLoadStatus.TIMEOUT
+        this.showTimeoutDialog()
       })
   }
 
@@ -65,8 +60,11 @@ struct HiNaviEntry {
     if (GlobalStore.isServerOnline) {
       SymbolGlyph($r('sys.symbol.checkmark')).fontColor([$r('sys.color.font')]).fontWeight(FontWeight.Bold)
         .fontSize(16)
-    } else {
+    } else if (GlobalStore.serverStatus === ServerLoadStatus.LOADING) {
       LoadingProgress().width(24)
+    } else {
+      SymbolGlyph($r('sys.symbol.exclamationmark')).fontColor([$r('sys.color.warning')]).fontWeight(FontWeight.Bold)
+        .fontSize(16)
     }
   }
 
@@ -76,11 +74,15 @@ struct HiNaviEntry {
         CommonListItem({
           icon: $r('sys.symbol.planets'),
           title: '服务器状态',
-          subtitle: GlobalStore.isServerOnline ? '已连接' : '连接中'
+          subtitle: GlobalStore.isServerOnline ? '已连接' : (GlobalStore.serverStatus === ServerLoadStatus.LOADING ? '连接中' : '连接失败')
         }) {
           this.UpStatus()
         }
-      }
+      }.onClick(() => {
+        if (GlobalStore.serverStatus === ServerLoadStatus.TIMEOUT) {
+          this.showTimeoutDialog()
+        }
+      })
       ListItem() {
         CommonListItem({
           icon: $r('sys.symbol.globe_badge_heart'),
@@ -154,5 +156,15 @@ struct HiNaviEntry {
     .title($r('app.string.app_name'))
     .backgroundColor($r('sys.color.background_secondary'))
     .expandSafeArea()
+  }
+
+  showTimeoutDialog() {
+    this.getUIContext().showAlertDialog({
+      title: '服务器连接超时',
+      message: '无法连接到位于 localhost:4533 的服务器，可能有以下原因：\n' +
+        '1. 上次虚拟机退出时未正常关机\n' +
+        '2. 向外部端口映射失败或 4533 端口被占用\n' +
+        '3. 虚拟机内服务器启动失败',
+    })
   }
 }

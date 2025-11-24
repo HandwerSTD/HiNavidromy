@@ -2,7 +2,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { Want, common, wantConstant } from "@kit.AbilityKit"
 import { fileUri, picker } from '@kit.CoreFileKit';
 import { fileIo as fs } from '@kit.CoreFileKit'
-import { CustomContentDialog, LoadingDialog, PromptAction } from "@kit.ArkUI";
+import { CustomContentDialog, LoadingDialog, promptAction, PromptAction } from "@kit.ArkUI";
 import { pasteboard } from '@kit.BasicServicesKit'
 import validateFolderName from '../lib/validateFolderName'
 import { util } from "@kit.ArkTS";
@@ -38,6 +38,11 @@ export struct SharedFolderContent {
   exportProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
       content: $r('app.string.exporting_file_to_shared_folder'),
+    }),
+  })
+  removeProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '删除文件中',
     }),
   })
   createFolderController = new CustomDialogController({
@@ -137,6 +142,9 @@ export struct SharedFolderContent {
                 }, {
                   value: $r('app.string.copy_guest_path'),
                   action: () => this.copyGuestPath(item.name)
+                }, {
+                  value: '删除文件',
+                  action: () => this.deleteFileOrFolder(item.name, Type.File)
                 }])
             } else if (item.type == Type.Folder) {
               SymbolGlyph($r('sys.symbol.dot_grid_1x2'))
@@ -147,6 +155,18 @@ export struct SharedFolderContent {
                 .bindMenu([{
                   value: $r('app.string.copy_guest_path'),
                   action: () => this.copyGuestPath(item.name)
+                }, {
+                  value: '删除文件夹',
+                  action: () => {
+                    const guest = [this.guest, ...this.current.slice(1), item.name].join('/')
+                    if (guest.startsWith('/mnt/share/music')) {
+                      promptAction.openToast({
+                        message: '不能删除音乐库目录'
+                      })
+                    } else {
+                      this.deleteFileOrFolder(item.name, Type.Folder)
+                    }
+                  }
                 }])
             }
           }
@@ -373,6 +393,49 @@ export struct SharedFolderContent {
   private async backToParent() {
     this.current.splice(this.current.length - 1, 1)
     this.refreshFileList()
+  }
+
+  private deleteFileOrFolder(name: string, type: Type) {
+    const typeStr = type === Type.File ? '文件' : '文件夹'
+    this.getUIContext().showAlertDialog({
+      title: '确认删除',
+      message: `${typeStr}: ${name}`,
+      primaryButton: {
+        value: '取消',
+        action: () => {}
+      },
+      secondaryButton: {
+        value: '删除',
+        fontColor: $r('sys.color.warning'),
+        action: async () => {
+          await this.performDelete(name)
+        }
+      }
+    })
+  }
+
+  private async performDelete(name: string) {
+    const fullPath = [...this.current, name].join('/')
+    this.removeProgress.open()
+    try {
+      const stat = fs.statSync(fullPath)
+      if (stat.isDirectory()) {
+        await fs.rmdir(fullPath)
+      } else if (stat.isFile()) {
+        await fs.unlink(fullPath)
+      }
+      this.promptAction.openToast({
+        message: '删除成功'
+      })
+      await this.refreshFileList()
+    } catch (e) {
+      console.log('error deleting file/folder ' + fullPath, e)
+      this.promptAction.openToast({
+        message: '删除失败'
+      })
+    } finally {
+      this.removeProgress.close()
+    }
   }
 
   private async refreshFileList() {
