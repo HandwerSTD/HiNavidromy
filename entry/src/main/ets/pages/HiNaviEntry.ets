@@ -1,13 +1,26 @@
+import { AegStrUtil } from '@hw-agconnect/petal-aegis'
+import common from '@ohos.app.ability.common'
 import { SpinKit } from '@pura/harmony-dialog'
+import { Base64Util } from '@pura/harmony-utils'
 import GlobalStore from '../common/statemgmt/GlobalStore'
 import { NavidromeServerUtils, ServerLoadStatus, VMUtils } from '../common/utils/NavidromeServerUtils'
-import { CommonListItem } from '../components/component_library/CommonListItem'
+import { CommonItemContainer, CommonListItem } from '../components/component_library/CommonListItem'
 import SettingsContent from '../components/SettingsContent'
 import { SharedFolderContent } from '../components/SharedFolderContent'
 import WebTerminal from '../components/WebTerminal'
 import { NavidromeWeb } from '../hinavi/views/NavidromeWeb'
+import { UsefulTerminalView } from '../hinavi/views/UsefulTerminalView'
 import { Index } from './Index'
 
+export interface NavidromeRequestContext {
+  baseUrl: string; // Navidrome API 根地址
+  username: string;
+  password?: string; // 可选（明文登录）
+  token?: string; // 可选（已生成的 token）
+  salt?: string;  // 用于 Subsonic API token 生成
+  apiVersion?: string; // 默认 '1.16.1'
+  clientName?: string; // 客户端标识
+}
 
 @Entry
 @ComponentV2
@@ -23,7 +36,15 @@ struct HiNaviEntry {
         this.showTimeoutDialog()
       })
   }
-
+  sharePlainAPILink() {
+    const raw_data = (new AegStrUtil()).ohAegStringToUint8Array(JSON.stringify({
+      baseUrl: 'http://localhost:4533/',
+      username: 'CloudPurePlay',
+      password: 'localhostPurePlay'
+    } as NavidromeRequestContext))
+    const data = Base64Util.encodeToStrSync(raw_data)
+    return `cloudpureplay://shareConfig/share?type=plain&api=Navidrome&data=${data}`
+  }
   @Builder PageMap(name: string) {
     if (name === 'MusicFolder') {
       NavDestination() {
@@ -36,6 +57,8 @@ struct HiNaviEntry {
       NavDestination() {
         SettingsContent()
       }.title('应用设置')
+    } else if (name === 'CommonCommands') {
+      UsefulTerminalView()
     }
   }
 
@@ -83,11 +106,32 @@ struct HiNaviEntry {
           this.showTimeoutDialog()
         }
       })
+      if (GlobalStore.isServerOnline) {
+        ListItem() {
+          CommonItemContainer() {
+            CommonListItem({
+              icon: $r('sys.symbol.identify_song'),
+              title: '快速启动云净听',
+              isCompose: true,
+            }).onClick(() => {
+              (this.getUIContext().getHostContext()! as common.UIAbilityContext).openLink('https://handwer.space/cloudpureplay')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.arrowshape_up'),
+              title: '拉起云净听添加配置',
+              isCompose: true,
+            }).onClick(() => {
+              (this.getUIContext().getHostContext()! as common.UIAbilityContext).openLink(this.sharePlainAPILink())
+            })
+          }
+        }.transition(TransitionEffect.OPACITY.animation({duration: 300}))
+      }
       ListItem() {
         CommonListItem({
           icon: $r('sys.symbol.globe_badge_heart'),
           title: 'Navidrome 主页'
         }).onClick(() => {
+          // TODO: 提示密码
           GlobalStore.pageStack.pushPathByName('NavidromeWeb', [])
         })
       }
@@ -131,14 +175,29 @@ struct HiNaviEntry {
           })
       }
       ListItem() {
-        CommonListItem({
-          icon: $r('sys.symbol.text_alignleft'),
-          title: '终端管理',
-          trailing: () => {
-            this.Terminal()
-          },
-          trailingOnBottom: true
-        })
+        CommonItemContainer() {
+          CommonListItem({
+            icon: $r('sys.symbol.text_alignleft'),
+            title: '终端管理',
+            isCompose: true
+          }) {}
+          CommonListItem({
+            icon: $r('sys.symbol.bolt_fill'),
+            title: '常用功能',
+            isCompose: true
+          }).onClick(() => {
+            GlobalStore.pageStack.pushPathByName('CommonCommands',[])
+          })
+          CommonListItem({
+            icon: $r('sys.symbol.rectangle_stack'),
+            title: '实时终端',
+            trailing: () => {
+              this.Terminal()
+            },
+            trailingOnBottom: true,
+            isCompose: true
+          })
+        }
       }
     }
     .padding({left: 12, right: 12})
