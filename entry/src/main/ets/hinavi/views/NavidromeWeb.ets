@@ -1,6 +1,8 @@
 import { webview } from "@kit.ArkWeb"
-import { SymbolGlyphModifier } from "@kit.ArkUI"
-4
+import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
+import { pasteboard } from "@kit.BasicServicesKit"
+
+
 @ComponentV2
 export struct NavidromeWeb {
   controller = new webview.WebviewController()
@@ -16,6 +18,27 @@ export struct NavidromeWeb {
         })
         .width('100%').height('100%')
         .expandSafeArea()
+        .onLoadIntercept((event) => {
+          if (event.data.getRequestUrl().endsWith('/app/')) {
+            this.getUIContext().showAlertDialog({
+              title: '管理员账户',
+              message: '默认的管理员账户密码分别为：\nCloudPurePlay\nlocalhostPurePlay\n您也可以在《云净听》音乐源配置界面查看该账号密码。',
+              primaryButton: {
+                value: '复制账号密码',
+                action: () => {
+                  pasteboard.getSystemPasteboard().setDataSync(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, 'CloudPurePlay localhostPurePlay'))
+                }
+              },
+              secondaryButton: {
+                value: $r('sys.string.general_confirm'),
+                action: () => {
+
+                }
+              }
+            })
+          }
+          return false
+        })
     }
     .title('Navidrome')
     .menus([{

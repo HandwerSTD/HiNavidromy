@@ -131,7 +131,6 @@ struct HiNaviEntry {
           icon: $r('sys.symbol.globe_badge_heart'),
           title: 'Navidrome 主页'
         }).onClick(() => {
-          // TODO: 提示密码
           GlobalStore.pageStack.pushPathByName('NavidromeWeb', [])
         })
       }
