@@ -1,6 +1,7 @@
 import { webview } from "@kit.ArkWeb"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { pasteboard } from "@kit.BasicServicesKit"
+import { MyLogUtil } from "../../common/utils/Logger"
 
 
 @ComponentV2
@@ -19,6 +20,7 @@ export struct NavidromeWeb {
         .width('100%').height('100%')
         .expandSafeArea()
         .onLoadIntercept((event) => {
+          MyLogUtil.debug(`Navidrome web `, `viewing ${event.data.getRequestUrl()}`)
           if (event.data.getRequestUrl().endsWith('/app/')) {
             this.getUIContext().showAlertDialog({
               title: '管理员账户',
