@@ -159,10 +159,8 @@ export struct SharedFolderContent {
                   value: '删除文件夹',
                   action: () => {
                     const guest = [this.guest, ...this.current.slice(1), item.name].join('/')
-                    if (guest.startsWith('/mnt/share/music')) {
-                      promptAction.openToast({
-                        message: '不能删除音乐库目录'
-                      })
+                    if (guest === ('/mnt/share/music')) {
+                      this.clearMusicFolder()
                     } else {
                       this.deleteFileOrFolder(item.name, Type.Folder)
                     }
@@ -368,8 +366,8 @@ export struct SharedFolderContent {
     VMUtils.suspendAndExecuteCommand('chmod -R o+rwx /mnt/share')
   }
 
-  async createFolderToCurrent() {
-    const name = this.tempFolderName
+  async createFolderToCurrent(dest_name?: string) {
+    const name = dest_name ?? this.tempFolderName
     const destPath = [...this.current, name].join('/')
     try {
       fs.mkdirSync(destPath)
@@ -395,6 +393,28 @@ export struct SharedFolderContent {
     this.refreshFileList()
   }
 
+  private clearMusicFolder() {
+    this.getUIContext().showAlertDialog({
+      title: '清空音乐库',
+      message: '确认要清空音乐库吗？此操作不可逆',
+      primaryButton: {
+        value: '取消',
+        action: () => {}
+      },
+      secondaryButton: {
+        value: '确认',
+        fontColor: $r('sys.color.warning'),
+        action: async () => {
+          await this.performDelete('music')
+          await this.createFolderToCurrent('music')
+          promptAction.openToast({
+            message: '清空音乐库完成'
+          })
+          // TODO: send request to navidrome for re-scan
+        }
+      }
+    })
+  }
   private deleteFileOrFolder(name: string, type: Type) {
     const typeStr = type === Type.File ? '文件' : '文件夹'
     this.getUIContext().showAlertDialog({
