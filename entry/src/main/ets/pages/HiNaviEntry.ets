@@ -10,6 +10,7 @@ import { SharedFolderContent } from '../components/SharedFolderContent'
 import WebTerminal from '../components/WebTerminal'
 import { NavidromeWeb } from '../hinavi/views/NavidromeWeb'
 import { UsefulTerminalView } from '../hinavi/views/UsefulTerminalView'
+import { FirstOpenPage } from './FirstOpenPages/FirstOpenPage'
 import { Index } from './Index'
 
 export interface NavidromeRequestContext {
@@ -26,10 +27,12 @@ export interface NavidromeRequestContext {
 @ComponentV2
 struct HiNaviEntry {
   @Local showTerminal: boolean = true
+  @Local showFirstStart: boolean = false
 
   scroller = new Scroller()
 
   aboutToAppear(): void {
+    this.showFirstStart = true // TODO: preference
     NavidromeServerUtils.checkConnectionOnStart()
       .catch(() => {
         GlobalStore.serverStatus = ServerLoadStatus.TIMEOUT
@@ -205,6 +208,12 @@ struct HiNaviEntry {
     .layoutWeight(1)
   }
 
+  @Builder FirstStart() {
+    FirstOpenPage({
+      onClose: () => {this.showFirstStart = false}
+    })
+  }
+
   build() {
     Navigation(GlobalStore.pageStack) {
       this.MainList()
@@ -214,13 +223,18 @@ struct HiNaviEntry {
     .title($r('app.string.app_name'))
     .backgroundColor($r('sys.color.background_secondary'))
     .expandSafeArea()
+    .bindSheet(this.showFirstStart!!, this.FirstStart(), {
+      showClose: false, onWillDismiss: (action) => {
+        if (!this.showFirstStart) action.dismiss()
+      },backgroundColor: $r('sys.color.ohos_id_color_panel_bg')
+    })
   }
 
   showTimeoutDialog() {
     this.getUIContext().showAlertDialog({
       title: '服务器连接超时',
       message: '无法连接到位于 localhost:4533 的服务器，可能有以下原因：\n' +
-        '1. 上次虚拟机退出时未正常关机\n' +
+        '1. 距离上次虚拟机退出时间过短\n' +
         '2. 向外部端口映射失败或 4533 端口被占用\n' +
         '3. 虚拟机内服务器启动失败',
     })

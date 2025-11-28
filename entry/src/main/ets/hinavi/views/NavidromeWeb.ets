@@ -25,6 +25,7 @@ export struct NavidromeWeb {
             this.getUIContext().showAlertDialog({
               title: '管理员账户',
               message: '默认的管理员账户密码分别为：\nCloudPurePlay\nlocalhostPurePlay\n您也可以在《云净听》音乐源配置界面查看该账号密码。',
+              autoCancel: false,
               primaryButton: {
                 value: '复制账号密码',
                 action: () => {
