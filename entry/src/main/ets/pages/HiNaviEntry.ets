@@ -1,8 +1,10 @@
 import { AegStrUtil } from '@hw-agconnect/petal-aegis'
 import common from '@ohos.app.ability.common'
+import preference from '@ohos.data.preferences'
 import { SpinKit } from '@pura/harmony-dialog'
 import { Base64Util } from '@pura/harmony-utils'
 import GlobalStore from '../common/statemgmt/GlobalStore'
+import appOption from '../model/appOption'
 import { NavidromeServerUtils, ServerLoadStatus, VMUtils } from '../common/utils/NavidromeServerUtils'
 import { CommonItemContainer, CommonListItem } from '../components/component_library/CommonListItem'
 import SettingsContent from '../components/SettingsContent'
@@ -30,9 +32,13 @@ struct HiNaviEntry {
   @Local showFirstStart: boolean = false
 
   scroller = new Scroller()
+  context = this.getUIContext().getHostContext()! as common.UIAbilityContext
+  preferences?: preference.Preferences
 
-  aboutToAppear(): void {
-    this.showFirstStart = true // TODO: preference
+  async aboutToAppear(): Promise<void> {
+    this.preferences = await preference.getPreferences(this.context.getApplicationContext(), appOption.preferenceName)
+    const firstOpenCompleted = await this.preferences.get(appOption.firstOpenCompleted, false) as boolean
+    this.showFirstStart = !firstOpenCompleted
     NavidromeServerUtils.checkConnectionOnStart()
       .catch(() => {
         GlobalStore.serverStatus = ServerLoadStatus.TIMEOUT
@@ -210,7 +216,11 @@ struct HiNaviEntry {
 
   @Builder FirstStart() {
     FirstOpenPage({
-      onClose: () => {this.showFirstStart = false}
+      onClose: async () => {
+        await this.preferences?.put(appOption.firstOpenCompleted, true)
+        await this.preferences?.flush()
+        this.showFirstStart = false
+      }
     })
   }
 
