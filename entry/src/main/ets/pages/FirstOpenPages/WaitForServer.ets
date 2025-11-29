@@ -30,8 +30,8 @@ export struct WaitForServer {
   build() {
     ImageTitleWelcomeTemplate({
       customImage: this.icon,
-      title: '等待服务器上线',
-      subtitle: GlobalStore.serverStatus === ServerLoadStatus.LOADING ? '正在等待服务器上线' : '服务器上线失败',
+      title: '应用启动中',
+      subtitle: GlobalStore.serverStatus === ServerLoadStatus.LOADING ? '正在加载服务器' : '服务器上线失败',
       footer: () => { this.footer() }
     })
   }
