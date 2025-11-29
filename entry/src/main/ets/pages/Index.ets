@@ -86,7 +86,7 @@ struct PcIndex {
         right: 150,
       })
 
-      WebTerminal({ showVirtKey: false })
+      WebTerminal({ })
         .layoutWeight(1)
     }
     .width("100%")
@@ -140,7 +140,7 @@ struct PhoneOrTablet {
       controller: this.tabsController
     }) {
       TabContent() {
-        WebTerminal({ showVirtKey: true })
+        WebTerminal({  })
       }
       .tabBar(this.tabBuilder($r('app.string.shell'), 0, $r('sys.symbol.house')))
 

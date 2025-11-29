@@ -83,14 +83,14 @@ export struct UsefulTerminalView {
             }).onClick(() => {
               VMUtils.suspendAndExecuteCommand('htop')
             })
-            CommonListItem({
-              icon: $r('sys.symbol.xmark_circle'),
-              title: '按名称结束进程',
-              subtitle: 'pkill [进程名]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现或者提示用户
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.xmark_circle'),
+            //   title: '按名称结束进程',
+            //   subtitle: 'pkill [进程名]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现或者提示用户
+            // })
           }
         }
 
@@ -128,36 +128,36 @@ export struct UsefulTerminalView {
             })
             CommonListItem({
               icon: $r('sys.symbol.hard_disk'),
-              title: '目录大小',
-              subtitle: 'du -sh *',
+              title: '音乐库目录大小',
+              subtitle: 'du -sh /mnt/share/',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('du -sh *')
+              VMUtils.suspendAndExecuteCommand('du -sh /mnt/share/')
             })
-            CommonListItem({
-              icon: $r('sys.symbol.magnifyingglass'),
-              title: '查找文件',
-              subtitle: 'find . -name [文件名]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.lock_fill'),
-              title: '修改文件权限',
-              subtitle: 'chmod [权限] [文件]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.person_2'),
-              title: '修改文件所有者',
-              subtitle: 'chown [用户]:[组] [文件]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.magnifyingglass'),
+            //   title: '查找文件',
+            //   subtitle: 'find . -name [文件名]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.lock_fill'),
+            //   title: '修改文件权限',
+            //   subtitle: 'chmod [权限] [文件]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.person_2'),
+            //   title: '修改文件所有者',
+            //   subtitle: 'chown [用户]:[组] [文件]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
           }
         }
 
@@ -273,28 +273,28 @@ export struct UsefulTerminalView {
             })
             CommonListItem({
               icon: $r('sys.symbol.clock_arrow_2_circlepath'),
-              title: '实时查看日志',
+              title: '实时查看日志（Ctrl+C退出）',
               subtitle: 'tail -f /var/log/navidrome.log',
               isCompose: true
             }).onClick(() => {
               VMUtils.suspendAndExecuteCommand('tail -f /var/log/navidrome.log')
             })
-            CommonListItem({
-              icon: $r('sys.symbol.doc_text'),
-              title: '查看文件末尾',
-              subtitle: 'tail -f [文件]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.doc_plaintext'),
-              title: '查看文件开头',
-              subtitle: 'head -n 20 [文件]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.doc_text'),
+            //   title: '查看文件末尾',
+            //   subtitle: 'tail -f [文件]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.doc_plaintext'),
+            //   title: '查看文件开头',
+            //   subtitle: 'head -n 20 [文件]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
           }
         }
 
@@ -349,6 +349,14 @@ export struct UsefulTerminalView {
             }) {}
             CommonListItem({
               icon: $r('sys.symbol.loading'),
+              title: '已安装软件包',
+              subtitle: 'apk info',
+              isCompose: true
+            }).onClick(() => {
+              VMUtils.suspendAndExecuteCommand('apk info')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.loading'),
               title: '更新软件源',
               subtitle: 'apk update',
               isCompose: true
@@ -363,38 +371,38 @@ export struct UsefulTerminalView {
             }).onClick(() => {
               VMUtils.suspendAndExecuteCommand('apk upgrade')
             })
-            CommonListItem({
-              icon: $r('sys.symbol.download_1'),
-              title: '安装软件',
-              subtitle: 'apk add [软件名]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.trash'),
-              title: '卸载软件',
-              subtitle: 'apk remove [软件名]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.magnifyingglass_circle'),
-              title: '搜索软件包',
-              subtitle: 'apk search [关键词]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.info_circle'),
-              title: '软件包信息',
-              subtitle: 'apk info [软件名]',
-              isCompose: true
-            }).onClick(() => {
-              // 这个命令需要用户输入参数，保留空实现
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.download_1'),
+            //   title: '安装软件',
+            //   subtitle: 'apk add [软件名]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.trash'),
+            //   title: '卸载软件',
+            //   subtitle: 'apk remove [软件名]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.magnifyingglass_circle'),
+            //   title: '搜索软件包',
+            //   subtitle: 'apk search [关键词]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.info_circle'),
+            //   title: '软件包信息',
+            //   subtitle: 'apk info [软件名]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
           }
         }
 

@@ -44,6 +44,7 @@ class GlobalStore {
   @Trace isFirstOpenFinished: boolean = true
 
   @Trace serverStatus: ServerLoadStatus = ServerLoadStatus.LOADING
+  @Trace showTerminal: boolean = false
 
   contextFaker?: common.UIAbilityContext
 

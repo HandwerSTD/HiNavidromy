@@ -12,7 +12,7 @@ export enum ServerLoadStatus {
 
 export class NavidromeServerUtils {
   static checkConnectionOnStart() {
-    // 90s 登录时间
+    // 60s 登录时间
     return RetryUtil.retryIf<void>(30, async () => {
       // http
       const cli = http.createHttp()
@@ -24,7 +24,7 @@ export class NavidromeServerUtils {
         })
     }, () => {
       return !GlobalStore.isServerOnline
-    }, 3000)
+    }, 2000)
   }
 }
 function stringToArrayBuffer(str: string, encoding: buffer.BufferEncoding = 'utf-8'): ArrayBuffer {
@@ -58,8 +58,11 @@ export class VMUtils {
     cmd += '\n'
     VMUtils.send([ControlCharacters.CTRL_C, cmd])
   }
-  static suspendAndExecuteCommand(cmd: string) {
+  static suspendAndExecuteCommand(cmd: string, showTerminal: boolean = true) {
     cmd += '\n'
     VMUtils.send([ControlCharacters.CTRL_Z, ControlCharacters.CTRL_C, cmd, 'fg\n'])
+    if (showTerminal) {
+      GlobalStore.showTerminal = true
+    }
   }
 }

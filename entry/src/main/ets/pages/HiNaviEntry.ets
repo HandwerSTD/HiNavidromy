@@ -77,15 +77,7 @@ struct HiNaviEntry {
         .onClick(() => {
           this.showTerminal = !this.showTerminal
         })
-      WebTerminal({
-        showVirtKey: true
-      }).layoutWeight(1)
-        .visibility(this.showTerminal ? Visibility.Visible : Visibility.None)
-        // .transition(TransitionEffect.OPACITY.animation({duration: 300}))
-        .padding({top: 12, bottom: 12})
     }.width('100%')
-    .height(this.showTerminal ? 500 : 40)
-    .animation({duration: 300})
   }
 
   @Builder UpStatus() {
@@ -171,7 +163,7 @@ struct HiNaviEntry {
                 fontColor: $r('sys.color.warning'),
                 action: () => {
                   this.showTerminal = true
-                  VMUtils.breakAndExecuteCommand('poweroff')
+                  VMUtils.suspendAndExecuteCommand('poweroff')
                 }
               },
               secondaryButton: {
@@ -199,12 +191,14 @@ struct HiNaviEntry {
           CommonListItem({
             icon: $r('sys.symbol.rectangle_stack'),
             title: '实时终端',
-            trailing: () => {
-              this.Terminal()
-            },
-            trailingOnBottom: true,
             isCompose: true
           })
+            .onClick(() => {
+              GlobalStore.showTerminal = true
+            })
+          if (!GlobalStore.showTerminal) {
+            WebTerminal().height(1).clip(true).opacity(0).hitTestBehavior(HitTestMode.Block)
+          }
         }
       }
     }
@@ -223,20 +217,39 @@ struct HiNaviEntry {
       }
     })
   }
+  @Builder WebTerm() {
+    Column({space: 12}) {
+      WebTerminal()
+        .layoutWeight(1).width('100%')
+      Button('关闭')
+        .onClick(() => {
+          GlobalStore.showTerminal = false
+        })
+        .width('100%')
+    }.height('100%').padding({left: 12, right: 12, top: 12, bottom: 18})
+  }
 
   build() {
-    Navigation(GlobalStore.pageStack) {
-      this.MainList()
-    }.width('100%')
-    .height('100%')
-    .navDestination(this.PageMap)
-    .title($r('app.string.app_name'))
-    .backgroundColor($r('sys.color.background_secondary'))
-    .expandSafeArea()
-    .bindSheet(this.showFirstStart!!, this.FirstStart(), {
-      showClose: false, onWillDismiss: (action) => {
-        if (!this.showFirstStart) action.dismiss()
-      },backgroundColor: $r('sys.color.ohos_id_color_panel_bg')
+    Column() {
+      Navigation(GlobalStore.pageStack) {
+        this.MainList()
+      }.width('100%')
+      .height('100%')
+      .navDestination(this.PageMap)
+      .title($r('app.string.app_name'))
+      .backgroundColor($r('sys.color.background_secondary'))
+      .expandSafeArea()
+      .bindSheet(this.showFirstStart!!, this.FirstStart(), {
+        showClose: false, onWillDismiss: (action) => {
+          if (!this.showFirstStart) action.dismiss()
+        },backgroundColor: $r('sys.color.ohos_id_color_panel_bg')
+      })
+    }.bindSheet(GlobalStore.showTerminal!!, this.WebTerm(), {
+      showClose: false,backgroundColor: $r('sys.color.ohos_id_color_panel_bg'),
+      onDisappear: () => {
+        GlobalStore.showTerminal = false;
+      },
+      preferType: SheetType.CENTER
     })
   }
 
