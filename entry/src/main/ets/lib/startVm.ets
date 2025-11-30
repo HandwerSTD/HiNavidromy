@@ -1,5 +1,5 @@
 import { fileIo as fs } from '@kit.CoreFileKit'
-import napi from 'libentry.so'
+import { VMSwitcher } from './VMSwitcher'
 
 interface PortMapping {
   guest?: number
@@ -43,7 +43,7 @@ function startVm(options: VmOptions) {
     fs.mkdirSync(options.sharedFolder)
   }
 
-  napi.startVM({
+  VMSwitcher.startVM({
     argsLines: args.join('\n'),
     unixSocket: options.serialUnixSocket
   });

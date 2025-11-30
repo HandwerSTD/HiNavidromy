@@ -12,4 +12,4 @@ include_directories(${NATIVERENDER_ROOT_PATH}
                     ${NATIVERENDER_ROOT_PATH}/include)
 
 add_library(tci SHARED napi_init.cpp)
-target_link_libraries(tci PUBLIC libace_napi.z.so)
+target_link_libraries(tci PUBLIC libace_napi.z.so libhilog_ndk.z.so)

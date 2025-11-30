@@ -48,7 +48,7 @@ static QemuSystemEntry getQemuSystemEntry() {
         return qemuSystemEntry;
     }
 
-    const char *libQemuPath = "libqemu-system-aarch64.so";
+    const char *libQemuPath = "libqemu-system-aarch64-tci.so";
 
     void *libQemuHandle = dlopen(libQemuPath, RTLD_LAZY);
 

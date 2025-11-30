@@ -1,8 +1,8 @@
 import GlobalStore from "../statemgmt/GlobalStore";
 import { RetryUtil } from "./CommonUtil";
 import { http } from "@kit.NetworkKit";
-import napi from 'libentry.so'
 import { buffer } from "@kit.ArkTS";
+import { VMSwitcher } from "../../lib/VMSwitcher";
 
 export enum ServerLoadStatus {
   LOADING,
@@ -12,8 +12,9 @@ export enum ServerLoadStatus {
 
 export class NavidromeServerUtils {
   static checkConnectionOnStart() {
+    const timeout = VMSwitcher.isTCI ? 40 : 30
     // 60s 登录时间
-    return RetryUtil.retryIf<void>(30, async () => {
+    return RetryUtil.retryIf<void>(timeout, async () => {
       // http
       const cli = http.createHttp()
       return cli.request('localhost:4533')
@@ -46,7 +47,7 @@ export class VMUtils {
   static send(cmd: string | string[]) {
     const sendInput = (data: string) => {
       let buffer = stringToArrayBuffer(data, 'utf-8');
-      napi.sendInput(buffer)
+      VMSwitcher.sendInput(buffer)
     }
     if (typeof cmd === 'string') {
       sendInput(cmd)

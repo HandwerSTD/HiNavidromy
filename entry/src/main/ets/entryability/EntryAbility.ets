@@ -7,7 +7,6 @@ import fs from '@ohos.file.fs';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import bundleManager from '@ohos.bundle.bundleManager';
 import appOption, { PortMapping } from '../model/appOption'
-import napi from 'libentry.so';
 import {
   File,
   InputStream,
@@ -19,6 +18,7 @@ import { startVm } from '../lib/startVm';
 import { PermissionUtil } from '@pura/harmony-utils';
 import { BackgroundTaskManager } from '../common/utils/BackgroundTaskManager';
 import { geoLocationManager } from '@kit.LocationKit';
+import { VMSwitcher } from '../lib/VMSwitcher';
 
 const DOMAIN = 0x0000;
 
@@ -26,6 +26,8 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+    // TODO 在这里决定使用 TCG-JIT 还是 TCI
+    VMSwitcher.isTCI = false;
   }
 
   onDestroy(): void {
@@ -88,7 +90,7 @@ export default class EntryAbility extends UIAbility {
       for (let i = 0; i < candidates.length; i++) {
         let item = candidates[i];
         let port: number = item.host!!;
-        const used = napi.checkPortUsed(port)
+        const used = VMSwitcher.checkPortUsed(port)
         if (!used) {
           portMapping.push(item)
         } else {

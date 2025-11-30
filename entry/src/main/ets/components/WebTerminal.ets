@@ -1,11 +1,11 @@
 import util from '@ohos.util';
 import { buffer } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import napi from 'libentry.so';
 import { webview } from '@kit.ArkWeb';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { BuilderNode, FrameNode, NodeController, UIContext } from '@kit.ArkUI';
+import { VMSwitcher } from '../lib/VMSwitcher';
 
 const DOMAIN = 0x0000;
 
@@ -92,7 +92,7 @@ export class WebTerminalController extends NodeController {
   sendInput(data: string): void {
     hilog.info(DOMAIN, 'WebTerminal', 'sendInput, data: %{public}s', data);
     let buf = stringToArrayBuffer(data, 'utf-8');
-    napi.sendInput(buf);
+    VMSwitcher.sendInput(buf);
 
     if (this.ctrlPressed) {
       this.toggleCtrl();
@@ -101,7 +101,7 @@ export class WebTerminalController extends NodeController {
 
   async load(): Promise<void> {
     this.webviewController.runJavaScript('exports.setFocused(true)');
-    napi.onData((d: ArrayBuffer) => this.onData(d));
+    VMSwitcher.onData((d: ArrayBuffer) => this.onData(d));
   }
 
   async resize(): Promise<void> {

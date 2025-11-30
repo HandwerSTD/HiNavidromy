@@ -2,7 +2,7 @@
   "name": "tci",
   "version": "1.0.0",
   "description": "Please describe the basic information.",
-  "main": "Index.ets",
+  "main": "Index.ts",
   "author": "",
   "license": "Apache-2.0",
   "packageType": "InterfaceHar",
