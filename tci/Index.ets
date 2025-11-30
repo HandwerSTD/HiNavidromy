@@ -1,1 +1,1 @@
-export { add } from './src/main/ets/utils/Calc';
+export { TCI_VM } from './src/main/ets/utils/Exec';
