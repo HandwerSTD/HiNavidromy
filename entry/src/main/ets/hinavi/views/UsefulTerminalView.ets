@@ -446,14 +446,14 @@ export struct UsefulTerminalView {
             }).onClick(() => {
               VMUtils.suspendAndExecuteCommand('iostat')
             })
-            CommonListItem({
-              icon: $r('sys.symbol.shock_load_rate_fill'),
-              title: '系统负载',
-              subtitle: 'w',
-              isCompose: true
-            }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('w')
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.shock_load_rate_fill'),
+            //   title: '系统负载',
+            //   subtitle: 'w',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   VMUtils.suspendAndExecuteCommand('w')
+            // })
           }
         }
 

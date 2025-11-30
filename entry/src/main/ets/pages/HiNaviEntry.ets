@@ -177,7 +177,7 @@ struct HiNaviEntry {
       ListItem() {
         CommonItemContainer() {
           CommonListItem({
-            icon: $r('sys.symbol.text_alignleft'),
+            // icon: $r('sys.symbol.text_alignleft'),
             title: '终端管理',
             isCompose: true
           }) {}
@@ -221,6 +221,7 @@ struct HiNaviEntry {
     Column({space: 12}) {
       WebTerminal()
         .layoutWeight(1).width('100%')
+        .padding({bottom: 12})
       Button('关闭')
         .onClick(() => {
           GlobalStore.showTerminal = false
