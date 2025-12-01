@@ -28,7 +28,7 @@
   "modules": [
     {
       "name": "entry",
-      "srcPath": "./entry",
+      "srcPath": "./product/full_mode",
       "targets": [
         {
           "name": "default",

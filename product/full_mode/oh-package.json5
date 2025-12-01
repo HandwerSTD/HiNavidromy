@@ -1,5 +1,5 @@
 {
-  "name": "entry",
+  "name": "full_mode",
   "version": "1.0.2",
   "description": "HiSH entry",
   "main": "",
@@ -7,6 +7,6 @@
   "license": "",
   "dependencies": {
     "libentry.so": "file:./src/main/cpp/types/libentry",
-    "tci": "file:../tci"
+    "tci": "file:../../common/tci"
   }
 }

@@ -1,11 +1,10 @@
 {
   "module": {
-    "name": "entry",
+    "name": "full_mode",
     "type": "entry",
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
       "tablet",
       "2in1",
       "tv"
@@ -19,9 +18,6 @@
       },
       {
         "name": "ohos.permission.INTERNET"
-      },
-      {
-        "name": "ohos.permission.READ_WRITE_USER_FILE"
       },
       {
         "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
