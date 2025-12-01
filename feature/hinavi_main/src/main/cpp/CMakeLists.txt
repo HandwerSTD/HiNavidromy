@@ -10,6 +10,7 @@ endif()
 
 include_directories(${NATIVERENDER_ROOT_PATH}
                     ${NATIVERENDER_ROOT_PATH}/include)
+find_library(dsm-lib libdevice_security_mode.z.so)
 
 add_library(hinavi_main SHARED napi_init.cpp)
-target_link_libraries(hinavi_main PUBLIC libace_napi.z.so)
+target_link_libraries(hinavi_main PUBLIC libace_napi.z.so libhilog_ndk.z.so ${dsm-lib} libdeviceinfo_ndk.z.so)

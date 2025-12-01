@@ -1,0 +1,1 @@
+export { HiNaviEntry } from './src/main/ets/pages/HiNaviEntry'

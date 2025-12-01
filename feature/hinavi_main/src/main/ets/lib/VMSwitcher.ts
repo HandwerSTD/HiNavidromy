@@ -1,6 +1,6 @@
 import { TCI_VM } from "tci"
 import { TCG_VM } from "./TCG_Exec"
-import napi from 'libentry.so'
+import napi from 'libhinavi_main.so'
 
 type appOptions = {
   argsLines: string

@@ -6,7 +6,7 @@ import preference from '@ohos.data.preferences';
 import fs from '@ohos.file.fs';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import bundleManager from '@ohos.bundle.bundleManager';
-import appOption, { PortMapping } from '../model/appOption'
+import appOption, { PortMapping } from 'hinavi_main/src/main/ets/model/appOption'
 import {
   File,
   InputStream,
@@ -14,11 +14,11 @@ import {
   TarArchiveEntry,
   TarArchiveInputStream
 } from '@ohos/commons-compress';
-import { startVm } from '../lib/startVm';
+import { startVm } from 'hinavi_main/src/main/ets/lib/startVm';
 import { PermissionUtil } from '@pura/harmony-utils';
-import { BackgroundTaskManager } from '../common/utils/BackgroundTaskManager';
+import { BackgroundTaskManager } from 'hinavi_main/src/main/ets/common/utils/BackgroundTaskManager';
 import { geoLocationManager } from '@kit.LocationKit';
-import { VMSwitcher } from '../lib/VMSwitcher';
+import { VMSwitcher } from 'hinavi_main/src/main/ets/lib/VMSwitcher';
 
 const DOMAIN = 0x0000;
 
@@ -48,7 +48,11 @@ export default class EntryAbility extends UIAbility {
 
     await this.extractKernelAndRootFilesystem(appContext, appPref);
 
+    console.log('EXTRACT COMPLETED')
+
     await this.loadPreferences(appPref);
+
+    console.log('PREPARE START VM')
 
     await this.startVm(appContext);
 

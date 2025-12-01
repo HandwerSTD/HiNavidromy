@@ -6,7 +6,6 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "libentry.so": "file:./src/main/cpp/types/libentry",
-    "tci": "file:../../common/tci"
+    "hinavi_main": "file:../../feature/hinavi_main"
   }
 }

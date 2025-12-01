@@ -302,7 +302,7 @@ export default struct SettingsContent {
       Image($r('app.media.startIcon'))
         .width(50)
 
-      Text($r('app.string.app_name'))
+      Text('HiNavidromy')
         .margin({ top: 10 })
 
       Text(`${this.bundleInfo?.versionName}(${this.bundleInfo?.versionCode})`)

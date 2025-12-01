@@ -1,4 +1,4 @@
-import napi, { appOptions } from 'libentry.so'
+import napi, { appOptions } from 'libhinavi_main.so'
 
 export class TCG_VM {
   static startVM(appOptions: appOptions) {

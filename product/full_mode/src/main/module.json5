@@ -5,6 +5,7 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
+      "phone",
       "tablet",
       "2in1",
       "tv"
@@ -12,9 +13,6 @@
     "requestPermissions": [
       {
         "name": "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY"
-      },
-      {
-        "name": "ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION"
       },
       {
         "name": "ohos.permission.INTERNET"

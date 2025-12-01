@@ -363,7 +363,7 @@ export struct SharedFolderContent {
       }
     }
     this.importProgress.close()
-    VMUtils.suspendAndExecuteCommand('chmod -R o+rwx /mnt/share')
+    VMUtils.suspendAndExecuteCommand('chmod -R o+rwx /mnt/share', false)
   }
 
   async createFolderToCurrent(dest_name?: string) {

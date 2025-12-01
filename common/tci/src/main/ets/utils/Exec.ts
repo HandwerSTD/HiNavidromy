@@ -1,4 +1,4 @@
-import napi, { appOptions } from '../../../../../../../../common/tci/src/main/cpp/types/libtci/Index'
+import napi, { appOptions } from 'libtci.so'
 
 export class TCI_VM {
   static startVM(appOptions: appOptions) {
