@@ -26,8 +26,6 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
-    // TODO 在这里决定使用 TCG-JIT 还是 TCI
-    VMSwitcher.isTCI = false;
   }
 
   onDestroy(): void {
@@ -37,6 +35,13 @@ export default class EntryAbility extends UIAbility {
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+    const jit = await PermissionUtil.checkPermissions('ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY')
+    if (VMSwitcher.isSecurityMode() || !jit) {
+      VMSwitcher.isTCI = true;
+    } else {
+      VMSwitcher.isTCI = false;
+    }
 
     const appContext = this.context.getApplicationContext();
     const appPref: preference.Preferences = await preference.getPreferences(appContext, appOption.preferenceName);

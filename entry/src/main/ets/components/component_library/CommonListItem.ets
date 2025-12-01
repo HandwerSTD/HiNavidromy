@@ -52,13 +52,16 @@ export struct CommonListItem {
         }
       }
       .justifyContent(FlexAlign.Start)
-      .height(54)
       if (this.trailing && this.trailingOnBottom) {
         this.trailing()
       }
     }
     .hoverEffect(HoverEffect.Highlight)
-    .padding({ left: 12, right: 12, bottom: this.trailingOnBottom ? 12 : 0 })
+    .padding({ left: 12, right: 12, bottom: this.trailingOnBottom ? 12 : 8, top: 8 })
+    .justifyContent(FlexAlign.Center)
+    .constraintSize({
+      minHeight: 54
+    })
   }
   build() {
     if (this.isCompose) {

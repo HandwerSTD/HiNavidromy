@@ -1,5 +1,6 @@
 import { TCI_VM } from "tci"
 import { TCG_VM } from "./TCG_Exec"
+import napi from 'libentry.so'
 
 type appOptions = {
   argsLines: string
@@ -8,6 +9,9 @@ type appOptions = {
 
 export class VMSwitcher {
   static isTCI: boolean = false
+  static isSecurityMode() {
+    return napi.isSecurityMode()
+  }
   static startVM(appOptions: appOptions) {
     if (VMSwitcher.isTCI) TCI_VM.startVM(appOptions)
     else TCG_VM.startVM(appOptions)

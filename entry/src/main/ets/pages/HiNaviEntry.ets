@@ -2,7 +2,7 @@ import { AegStrUtil } from '@hw-agconnect/petal-aegis'
 import common from '@ohos.app.ability.common'
 import preference from '@ohos.data.preferences'
 import { SpinKit } from '@pura/harmony-dialog'
-import { Base64Util } from '@pura/harmony-utils'
+import { Base64Util, WantUtil } from '@pura/harmony-utils'
 import GlobalStore from '../common/statemgmt/GlobalStore'
 import appOption from '../model/appOption'
 import { NavidromeServerUtils, ServerLoadStatus, VMUtils } from '../common/utils/NavidromeServerUtils'
@@ -14,6 +14,7 @@ import { NavidromeWeb } from '../hinavi/views/NavidromeWeb'
 import { UsefulTerminalView } from '../hinavi/views/UsefulTerminalView'
 import { FirstOpenPage } from './FirstOpenPages/FirstOpenPage'
 import { Index } from './Index'
+import { VMSwitcher } from '../lib/VMSwitcher'
 
 export interface NavidromeRequestContext {
   baseUrl: string; // Navidrome API 根地址
@@ -44,6 +45,15 @@ struct HiNaviEntry {
         GlobalStore.serverStatus = ServerLoadStatus.TIMEOUT
         this.showTimeoutDialog()
       })
+    const portUsedByOthers = AppStorage.get(appOption.portUsedByOthers) as number[]
+    if (portUsedByOthers.length > 0) {
+      try {
+        GlobalStore.serverStatus = ServerLoadStatus.TIMEOUT
+        this.showTimeoutDialog()
+      } catch (e) {
+        console.error(`showToast error`, e);
+      }
+    }
   }
   sharePlainAPILink() {
     const raw_data = (new AegStrUtil()).ohAegStringToUint8Array(JSON.stringify({
@@ -94,6 +104,34 @@ struct HiNaviEntry {
 
   @Builder MainList() {
     List({space: 12, scroller: this.scroller}) {
+      if (VMSwitcher.isTCI) {
+        ListItem() {
+          CommonListItem({
+            icon: $r('sys.symbol.camera_mode_slow'),
+            title: '您正在以兼容模式运行，Navidrome 性能可能会受到影响',
+            subtitle: '点击查看说明'
+          }).onClick(() => {
+            this.getUIContext().showAlertDialog({
+              title: '兼容模式',
+              message: 'HiNavidromy 正在以兼容模式运行，此模式下内部代码会经过一层转译，因此运行速度可能显著变慢。进入兼容模式的原因可能有：\n' +
+                '1. 由于权限限制，部分设备在 AppGallery 应用市场安装时，仅支持兼容模式运行\n' +
+                '2. 您的设备开启了「坚盾守护模式」，此模式下应用运行权限受限，仅能使用兼容模式运行\n' +
+                '对于第一种情况，您可以自行构建开源版本，并使用开发者模式进行运行。',
+              primaryButton: {
+                value: '去查看开源仓库',
+                action: () => {
+                  WantUtil.toWebBrowser('https://github.com/HandwerSTD/hinavidromy')
+                }
+              },
+              secondaryButton: {
+                value: $r('sys.string.general_confirm'),
+                action: () => {}
+              },
+              buttonDirection: DialogButtonDirection.VERTICAL
+            })
+          })
+        }
+      }
       ListItem() {
         CommonListItem({
           icon: $r('sys.symbol.planets'),
@@ -181,13 +219,15 @@ struct HiNaviEntry {
             title: '终端管理',
             isCompose: true
           }) {}
-          CommonListItem({
-            icon: $r('sys.symbol.bolt_fill'),
-            title: '常用功能',
-            isCompose: true
-          }).onClick(() => {
-            GlobalStore.pageStack.pushPathByName('CommonCommands',[])
-          })
+          if (GlobalStore.isServerOnline) {
+            CommonListItem({
+              icon: $r('sys.symbol.bolt_fill'),
+              title: '常用功能',
+              isCompose: true
+            }).onClick(() => {
+              GlobalStore.pageStack.pushPathByName('CommonCommands',[])
+            })
+          }
           CommonListItem({
             icon: $r('sys.symbol.rectangle_stack'),
             title: '实时终端',
@@ -258,9 +298,8 @@ struct HiNaviEntry {
     this.getUIContext().showAlertDialog({
       title: '服务器连接超时',
       message: '无法连接到位于 localhost:4533 的服务器，可能有以下原因：\n' +
-        '1. 距离上次虚拟机退出时间过短\n' +
-        '2. 向外部端口映射失败或 4533 端口被占用\n' +
-        '3. 虚拟机内服务器启动失败',
+        '1. 向外部端口映射失败或 4533 端口被占用\n' +
+        '2. 虚拟机内服务器启动失败',
     })
   }
 }

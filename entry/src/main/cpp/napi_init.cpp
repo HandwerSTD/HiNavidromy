@@ -1,3 +1,4 @@
+#include <syscap_ndk.h>
 #include "napi/native_api.h"
 #include <assert.h>
 #include <cerrno>
@@ -20,6 +21,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <DeviceSecurityKit/device_security_mode.h>
+
 
 #include "hilog/log.h"
 #undef LOG_DOMAIN
@@ -387,13 +390,23 @@ static napi_value checkPortUsed(napi_env env, napi_callback_info info) {
     }
 }
 
+static napi_value NAPI_Global_isSecurityMode(napi_env env, napi_callback_info info) {
+    DSM_DeviceSecurityMode mode = DSM_DeviceSecurityMode{};
+    bool result = false;
+    if (canIUse("SystemCapability.Security.SafetyDetect")) {
+        mode = HMS_DSM_GetDeviceSecurityMode();
+        result = mode & DSM_SECURE_SHIELD_MODE;
+    }
+    return bool_from_int(env,result);
+}
 EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor desc[] = {
         {"startVM", nullptr, startVM, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"onData", nullptr, onData, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"sendInput", nullptr, sendInput, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"checkPortUsed", nullptr, checkPortUsed, nullptr, nullptr, nullptr, napi_default, nullptr}};
+        {"checkPortUsed", nullptr, checkPortUsed, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"isSecurityMode", nullptr, NAPI_Global_isSecurityMode, nullptr, nullptr, nullptr, napi_default, nullptr }};
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;
 }
