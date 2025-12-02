@@ -3,7 +3,7 @@ import { PermissionUtil } from "@pura/harmony-utils";
 import { PortMapping, startVm } from "../lib/startVm";
 import { VMSwitcher } from "../lib/VMSwitcher";
 import appOption from "../model/appOption";
-import { bundleManager, common } from "@kit.AbilityKit";
+import { application, bundleManager, common } from "@kit.AbilityKit";
 import { promptAction, window } from "@kit.ArkUI";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import preference from '@ohos.data.preferences';
@@ -223,10 +223,11 @@ class ServiceInitUtils {
     }
   }
 
-  private extractVmResourceFile(appContext: common.ApplicationContext, filename: string, reset: boolean) {
+  private async extractVmResourceFile(appContext: common.ApplicationContext, filename: string, reset: boolean) {
     let filePath = appContext.filesDir + "/" + filename;
     if (!fs.accessSync(filePath, fs.AccessModeType.EXIST) || reset) {
-      let value: Uint8Array = appContext.resourceManager.getRawFileContentSync(filename);
+      const resManager = await application.createModuleContext(appContext, 'hinavi_main')
+      let value: Uint8Array = resManager.resourceManager.getRawFileContentSync(filename);
       let file = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
       fs.writeSync(file.fd, value.buffer);
       fs.closeSync(file);
@@ -236,7 +237,8 @@ class ServiceInitUtils {
 
   private async extractRootFsTar(appContext: common.ApplicationContext, target: string) {
     try {
-      const value = appContext.resourceManager.getRawFileContentSync("vm/rootfs_aarch64.tar");
+      const resManager = await application.createModuleContext(appContext, 'hinavi_main')
+      const value = resManager.resourceManager.getRawFileContentSync("vm/rootfs_aarch64.tar");
       const tar = appContext.tempDir + '/rootfs_aarch64.tar';
       let file = fs.openSync(tar, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
       fs.writeSync(file.fd, value.buffer);
