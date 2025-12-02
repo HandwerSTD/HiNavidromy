@@ -33,11 +33,26 @@ export struct HiNaviEntry {
   scroller = new Scroller()
   context = this.getUIContext().getHostContext()! as common.UIAbilityContext
   preferences?: preference.Preferences
+  fakeProgressInterval?: number
 
   async aboutToAppear(): Promise<void> {
     this.preferences = await preference.getPreferences(this.context.getApplicationContext(), appOption.preferenceName)
     const firstOpenCompleted = await this.preferences.get(appOption.firstOpenCompleted, false) as boolean
     this.showFirstStart = !firstOpenCompleted
+
+    // 初始化假进度条
+    GlobalStore.fakeLoadingProgress = 0
+    const totalDuration = VMSwitcher.isTCI ? 70000 : 10000 // TCI: 70秒, 非TCI: 10秒
+    const intervalMs = 100
+    const increment = 100 / (totalDuration / intervalMs)
+    this.fakeProgressInterval = setInterval(() => {
+      if (GlobalStore.fakeLoadingProgress < 100) {
+        GlobalStore.fakeLoadingProgress = Math.min(100, GlobalStore.fakeLoadingProgress + increment)
+      } else {
+        clearInterval(this.fakeProgressInterval)
+      }
+    }, intervalMs)
+
     NavidromeServerUtils.checkConnectionOnStart()
       .catch(() => {
         GlobalStore.serverStatus = ServerLoadStatus.TIMEOUT
@@ -131,12 +146,23 @@ export struct HiNaviEntry {
         }
       }
       ListItem() {
-        CommonListItem({
-          icon: $r('sys.symbol.planets'),
-          title: '服务器状态',
-          subtitle: GlobalStore.isServerOnline ? '已连接' : (GlobalStore.serverStatus === ServerLoadStatus.LOADING ? '连接中' : '连接失败')
-        }) {
-          this.UpStatus()
+        CommonItemContainer() {
+          CommonListItem({
+            icon: $r('sys.symbol.planets'),
+            title: '服务器状态',
+            subtitle: GlobalStore.isServerOnline ? '已连接' : (GlobalStore.serverStatus === ServerLoadStatus.LOADING ? '连接中' : '连接失败'),
+            isCompose: true
+          }) {
+            this.UpStatus()
+          }
+          if (GlobalStore.serverStatus === ServerLoadStatus.LOADING) {
+            Row() {
+              Progress({ value: GlobalStore.fakeLoadingProgress, total: 100, type: ProgressType.Linear })
+                .style({ strokeWidth: 4 })
+                .layoutWeight(1)
+            }.width('100%')
+            .padding({left: 12, right: 12, bottom: 12})
+          }
         }
       }.onClick(() => {
         if (GlobalStore.serverStatus === ServerLoadStatus.TIMEOUT) {

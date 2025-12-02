@@ -47,6 +47,8 @@ class GlobalStore {
   @Trace showTerminal: boolean = false
   @Trace developerMode: boolean = false
 
+  @Trace fakeLoadingProgress: number = 0
+
   contextFaker?: common.UIAbilityContext
 
   get isServerOnline() {
