@@ -1,8 +1,7 @@
 {
   "module": {
     "name": "hinavi_main",
-    "type": "shared",
-    "deliveryWithInstall": true,
+    "type": "har",
     "deviceTypes": [
       "default",
       "tablet",
