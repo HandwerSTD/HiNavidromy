@@ -7,7 +7,7 @@ export struct OpenWelcome {
   build() {
     Column() {
       ImageTitleWelcomeTemplate({
-        title: '欢迎！',
+        title: '欢迎!',
         subtitle: 'HiNavidromy',
         image: $r('app.media.startIcon'),
       })

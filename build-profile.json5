@@ -7,11 +7,11 @@
         "material": {
           "certpath": "D:/HarmonyOS/liquid_studio/通用发布证书.cer",
           "keyAlias": "key",
-          "keyPassword": "000000206B9009BFCA1515C88A91636D935ED57D96AF437C8A96878E76DF6959ECE906F7752DC58916BF4A41049DD579",
+          "keyPassword": "00000020EE2D2618D7C8C4E92F0E52B6D61F9B1300E3FF71F70238C8063B7052C563D9111F067689BEEA23B510AE6040",
           "profile": "D:/HarmonyOS/liquid_studio/HiNavi发布Release.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "D:/HarmonyOS/liquid_studio/通用证书.p12",
-          "storePassword": "0000002004A77AF16CC059FD92F9C4D3CBC0CACEACCA53860F37A79D8C4511770836FAE312D8112BD78BE382BC6ED61D"
+          "storePassword": "000000207A2B223B25D9BC528A18334C6A18A94495BF4A1FEB136BFC6A3060D16A2360375DE4D3C06AC98FED0F537409"
         }
       },
       {
@@ -20,11 +20,11 @@
         "material": {
           "certpath": "C:\\Users\\handw\\.ohos\\config\\autosign_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001A592023FA900A3F9A2D097A27008AD16B8A0FD776525A6C6E2DA7926B65C38505609684DC1C87",
+          "keyPassword": "0000001A44628F1F0F8EC6586F7E239C2D0E3E3F6CC847443E78549D5B2455EA83160C14B35FCCCFBAAC",
           "profile": "C:\\Users\\handw\\.ohos\\config\\autosign_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\handw\\.ohos\\config\\autosign_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.p12",
-          "storePassword": "0000001AA38354031C8E19E732A4B9C2487D1C9291B5818702A82D9D1E6F8F4105CC87EC6EED1A616866"
+          "storePassword": "0000001A07806E7E66873D0FC5A48B22430715BF03C07BF37F8DCB99BDFC2D1BE6CFE9BEAD41120A995A"
         }
       }
     ],

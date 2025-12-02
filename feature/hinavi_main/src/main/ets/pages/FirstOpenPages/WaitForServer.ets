@@ -14,7 +14,12 @@ export struct WaitForServer {
 
   @Builder footer() {
     if (GlobalStore.serverStatus === ServerLoadStatus.LOADING) {
-      LoadingProgress().width(50)
+      Row() {
+        Progress({ value: GlobalStore.fakeLoadingProgress, total: 100, type: ProgressType.Linear })
+          .style({ strokeWidth: 4 })
+          .layoutWeight(1)
+      }.width('100%')
+      .padding({left: 12, right: 12, bottom: 12})
     } else {
       Button('尝试重启')
         .width('100%')
@@ -31,7 +36,7 @@ export struct WaitForServer {
     ImageTitleWelcomeTemplate({
       customImage: this.icon,
       title: '应用启动中',
-      subtitle: GlobalStore.serverStatus === ServerLoadStatus.LOADING ? '正在加载服务器，此过程可能持续一分钟，请不要退至后台或锁屏' : '服务器上线失败',
+      subtitle: GlobalStore.serverStatus === ServerLoadStatus.LOADING ? '正在加载服务器，此过程可能持续约一分钟，请不要退至后台或锁屏' : '服务器上线失败',
       footer: () => { this.footer() }
     })
   }
