@@ -397,6 +397,11 @@ static napi_value NAPI_Global_isSecurityMode(napi_env env, napi_callback_info in
         mode = HMS_DSM_GetDeviceSecurityMode();
         result = mode & DSM_SECURE_SHIELD_MODE;
     }
+#ifdef _DEBUG
+    OH_LOG_INFO(LOG_APP, "running in debug mode");
+#else
+    OH_LOG_INFO(LOG_APP, "running in release mode");
+#endif
     return bool_from_int(env,result);
 }
 EXTERN_C_START

@@ -11,6 +11,7 @@ import fs from '@ohos.file.fs';
 import { geoLocationManager } from "@kit.LocationKit";
 import { BackgroundTaskManager } from "./utils/BackgroundTaskManager";
 import GlobalStore from "./statemgmt/GlobalStore";
+import { DEBUG } from '../../../../BuildProfile'
 
 const DOMAIN = 0x0000;
 
@@ -21,10 +22,13 @@ class ServiceInitUtils {
     const jit = await PermissionUtil.checkPermissions('ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY')
     if (VMSwitcher.isSecurityMode() || !jit) {
       VMSwitcher.isTCI = true;
-      GlobalStore.developerMode = false;
     } else {
       VMSwitcher.isTCI = false;
-      GlobalStore.developerMode = true;
+    }
+    if (VMSwitcher.isTCI || !DEBUG) {
+      GlobalStore.developerMode = false;
+    } else {
+      GlobalStore.developerMode = true
     }
 
     const appContext = context.getApplicationContext();

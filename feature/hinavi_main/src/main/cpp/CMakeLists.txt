@@ -8,6 +8,10 @@ if(DEFINED PACKAGE_FIND_FILE)
     include(${PACKAGE_FIND_FILE})
 endif()
 
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+    add_definitions(-D_DEBUG)
+endif()
+
 include_directories(${NATIVERENDER_ROOT_PATH}
                     ${NATIVERENDER_ROOT_PATH}/include)
 find_library(dsm-lib libdevice_security_mode.z.so)
