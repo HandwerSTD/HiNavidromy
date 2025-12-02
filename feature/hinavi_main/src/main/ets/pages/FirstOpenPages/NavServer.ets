@@ -6,6 +6,7 @@ import { common } from "@kit.AbilityKit";
 import { promptAction } from "@kit.ArkUI";
 import { geoLocationManager } from "@kit.LocationKit";
 import preference from '@ohos.data.preferences';
+import GlobalStore from "../../common/statemgmt/GlobalStore";
 
 @ComponentV2
 export struct NavServer {
@@ -37,6 +38,8 @@ export struct NavServer {
           })
           pref!.put(appOption.simulateBg, true)
           pref!.flush()
+          AppStorage.set(appOption.simulateBg, true)
+          GlobalStore.simulateBg = true
         })
 
     }

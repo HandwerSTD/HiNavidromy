@@ -48,8 +48,8 @@ class ServiceInitUtils {
       await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
     AppStorage.setOrCreate('bundleInfo', bundleInfo)
   }
-  async startSimulateBg(context: common.UIAbilityContext) {
-    if (AppStorage.get<boolean>(appOption.simulateBg)) {
+  async startSimulateBg(context: common.UIAbilityContext, force: boolean = false) {
+    if (AppStorage.get<boolean>(appOption.simulateBg) || force) {
       PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
         .then((res) => {
           if (!res) {
@@ -66,8 +66,9 @@ class ServiceInitUtils {
           promptAction.openToast({
             message: '后台模拟启动成功'
           })
+          AppStorage.set(appOption.simulateBg, true)
+          GlobalStore.simulateBg = true
         })
-
     }
   }
 

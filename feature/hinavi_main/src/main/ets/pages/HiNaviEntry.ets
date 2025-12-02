@@ -14,6 +14,7 @@ import { NavidromeWeb } from '../hinavi/views/NavidromeWeb'
 import { UsefulTerminalView } from '../hinavi/views/UsefulTerminalView'
 import { FirstOpenPage } from './FirstOpenPages/FirstOpenPage'
 import { VMSwitcher } from '../lib/VMSwitcher'
+import { ServiceInitUtils } from '../../../../Index'
 
 export interface NavidromeRequestContext {
   baseUrl: string; // Navidrome API 根地址
@@ -115,36 +116,51 @@ export struct HiNaviEntry {
     }
   }
 
+  @Builder RecommendActions() {
+    if (VMSwitcher.isTCI) {
+      ListItem() {
+        CommonListItem({
+          icon: $r('sys.symbol.camera_mode_slow'),
+          title: '您正在以兼容模式运行，Navidrome 性能可能会受到影响',
+          subtitle: '点击查看说明'
+        }).onClick(() => {
+          this.getUIContext().showAlertDialog({
+            title: '兼容模式',
+            message: 'HiNavidromy 正在以兼容模式运行，此模式下内部代码会经过一层转译，因此运行速度可能显著变慢。进入兼容模式的原因可能有：\n' +
+              '1. 由于权限限制，部分设备在 AppGallery 应用市场安装时，仅支持兼容模式运行\n' +
+              '2. 您的设备开启了「坚盾守护模式」，此模式下应用运行权限受限，仅能使用兼容模式运行\n' +
+              '对于第一种情况，您可以自行构建开源版本，并使用开发者模式进行运行。',
+            primaryButton: {
+              value: '去查看开源仓库',
+              action: () => {
+                WantUtil.toWebBrowser('https://github.com/HandwerSTD/hinavidromy')
+              }
+            },
+            secondaryButton: {
+              value: $r('sys.string.general_confirm'),
+              action: () => {}
+            },
+            buttonDirection: DialogButtonDirection.VERTICAL
+          })
+        })
+      }
+    }
+    if (!GlobalStore.simulateBg) {
+      ListItem() {
+        CommonListItem({
+          icon: $r('sys.symbol.background_blurred'),
+          title: '应用在后台可能被冻结，Navidrome 可能无法连接',
+          subtitle: '点击启用模拟后台'
+        }).onClick(() => {
+          ServiceInitUtils.startSimulateBg(this.getUIContext().getHostContext()! as common.UIAbilityContext, true)
+        })
+      }
+    }
+  }
+
   @Builder MainList() {
     List({space: 12, scroller: this.scroller}) {
-      if (VMSwitcher.isTCI) {
-        ListItem() {
-          CommonListItem({
-            icon: $r('sys.symbol.camera_mode_slow'),
-            title: '您正在以兼容模式运行，Navidrome 性能可能会受到影响',
-            subtitle: '点击查看说明'
-          }).onClick(() => {
-            this.getUIContext().showAlertDialog({
-              title: '兼容模式',
-              message: 'HiNavidromy 正在以兼容模式运行，此模式下内部代码会经过一层转译，因此运行速度可能显著变慢。进入兼容模式的原因可能有：\n' +
-                '1. 由于权限限制，部分设备在 AppGallery 应用市场安装时，仅支持兼容模式运行\n' +
-                '2. 您的设备开启了「坚盾守护模式」，此模式下应用运行权限受限，仅能使用兼容模式运行\n' +
-                '对于第一种情况，您可以自行构建开源版本，并使用开发者模式进行运行。',
-              primaryButton: {
-                value: '去查看开源仓库',
-                action: () => {
-                  WantUtil.toWebBrowser('https://github.com/HandwerSTD/hinavidromy')
-                }
-              },
-              secondaryButton: {
-                value: $r('sys.string.general_confirm'),
-                action: () => {}
-              },
-              buttonDirection: DialogButtonDirection.VERTICAL
-            })
-          })
-        }
-      }
+      this.RecommendActions()
       ListItem() {
         CommonItemContainer() {
           CommonListItem({
@@ -215,26 +231,28 @@ export struct HiNaviEntry {
             GlobalStore.pageStack.pushPathByName('Settings',[])
           })
       }
-      ListItem() {
-        Button('正常关机').width('100%').backgroundColor($r('sys.color.warning'))
-          .onClick(() => {
-            this.getUIContext().showAlertDialog({
-              message: '确定要关机吗？',
-              primaryButton: {
-                value: $r('sys.string.general_confirm'),
-                fontColor: $r('sys.color.warning'),
-                action: () => {
-                  this.showTerminal = true
-                  VMUtils.suspendAndExecuteCommand('poweroff')
+      if (GlobalStore.isServerOnline) {
+        ListItem() {
+          Button('正常关机').width('100%').backgroundColor($r('sys.color.warning'))
+            .onClick(() => {
+              this.getUIContext().showAlertDialog({
+                message: '确定要关机吗？',
+                primaryButton: {
+                  value: $r('sys.string.general_confirm'),
+                  fontColor: $r('sys.color.warning'),
+                  action: () => {
+                    this.showTerminal = true
+                    VMUtils.suspendAndExecuteCommand('poweroff')
+                  }
+                },
+                secondaryButton: {
+                  value: $r('sys.string.general_cancel'),
+                  // fontColor: $r('sys.color.warning'),
+                  action: () => {}
                 }
-              },
-              secondaryButton: {
-                value: $r('sys.string.general_cancel'),
-                // fontColor: $r('sys.color.warning'),
-                action: () => {}
-              }
+              })
             })
-          })
+        }
       }
       if (GlobalStore.developerMode) {
         ListItem() {

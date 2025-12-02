@@ -48,6 +48,7 @@ class GlobalStore {
   @Trace developerMode: boolean = false
 
   @Trace fakeLoadingProgress: number = 0
+  @Trace simulateBg: boolean = false
 
   contextFaker?: common.UIAbilityContext
 
