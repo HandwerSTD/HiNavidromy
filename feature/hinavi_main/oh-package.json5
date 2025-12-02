@@ -5,6 +5,7 @@
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
+  "packageType": "InterfaceHar",
   "dependencies": {
     "libhinavi_main.so": "file:./src/main/cpp/types/libhinavi_main",
     "tci": "file:../../common/tci"

@@ -11,6 +11,10 @@
     {
       "name": "CompatEntryAbility_label",
       "value": "HiNavidromy"
+    },
+    {
+      "name": "setting_keep_background",
+      "value": "模拟后台运行"
     }
   ]
 }

@@ -1,4 +1,3 @@
-import { ThemeManager } from "@ohos/base"
 
 @ComponentV2
 export struct ActionButton {
