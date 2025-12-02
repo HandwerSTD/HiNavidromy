@@ -24,14 +24,14 @@
         "usedScene": {
           "when": "inuse"
         },
-        "reason": "$string:setting_keep_screen_on_desc"
+        "reason": "$string:setting_keep_background"
       },
       {
         "name": "ohos.permission.APPROXIMATELY_LOCATION",
         "usedScene": {
           "when": "inuse"
         },
-        "reason": "$string:setting_keep_screen_on_desc"
+        "reason": "$string:setting_keep_background"
       }
     ],
     "deliveryWithInstall": true,
