@@ -1,0 +1,118 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "debug",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\handw\\.ohos\\config\\debug_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A6E94791363BF714F354CD4EF54524CECE6C6295DFA99E6E28376D4878D0795A6EC74DDD27157",
+          "profile": "C:\\Users\\handw\\.ohos\\config\\debug_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\handw\\.ohos\\config\\debug_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.p12",
+          "storePassword": "0000001AA79B2E974415112EDEE16497851FE14484ED0E885C0FAF5FAF97612A2A345EF7E76FDF90425B"
+        }
+      },
+      {
+        "name": "release",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/HarmonyOS/liquid_studio/通用证书.p12",
+          "storePassword": "000000201B082094CFBCC6A6E766567E81CBA8EE14E596AA0AD782FD2E9141FEBB452AB2AA1C0F886688B30260671C6B",
+          "keyAlias": "key",
+          "keyPassword": "000000200A8FBA0FF27ADD137410F3C60DA51C8392DD109F81F40EA4FA5892A74EF1609494C12E40FD4D2285C27AF8EE",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/HarmonyOS/liquid_studio/HiNavi发布Release.p7b",
+          "certpath": "D:/HarmonyOS/liquid_studio/通用发布证书.cer"
+        }
+      },
+      {
+        "name": "autosign",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:/Users/handw/.ohos/config/autosign_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BEA5B28CBE035DE811D8924D2C83A719CF6A64697A8434463ADBA257C3610C4CFA10309A15918D9",
+          "profile": "C:/Users/handw/.ohos/config/autosign_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:/Users/handw/.ohos/config/autosign_HiSH_jniyjwi3Sz4_4FT4KfaPP5Uw-S-pCqHD7Hl2i9Ay1NM=.p12",
+          "storePassword": "0000001BB1B78F1E61094068BA2FBD1C0E10B02C3305EC1D87AED20E9007382E49EB399CBE145F92B09B7B"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "release",
+        "targetSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.1(13)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "full_mode",
+      "srcPath": "./product/full_mode",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tci",
+      "srcPath": "./common/tci",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hinavi_main",
+      "srcPath": "./feature/hinavi_main",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "compat_mode",
+      "srcPath": "./product/compat_mode",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
