@@ -169,10 +169,14 @@ class ServiceInitUtils {
     AppStorage.setOrCreate(appOption.sharedHost, sharedHost)
     AppStorage.setOrCreate(appOption.rootFilesystem, rootFilesystem)
 
-    // create music folder
-    // if (!fs.accessSync(sharedHost + '/music/', fs.AccessModeType.EXIST)) {
-    //   fs.mkdirSync(sharedHost + '/music/')
-    // }
+    // create shared folder and music subfolder
+    if (!fs.accessSync(sharedHost, fs.AccessModeType.EXIST)) {
+      fs.mkdirSync(sharedHost, true);
+    }
+    const musicFolder = sharedHost + '/music';
+    if (!fs.accessSync(musicFolder, fs.AccessModeType.EXIST)) {
+      fs.mkdirSync(musicFolder, true);
+    }
 
     AppStorage.setOrCreate(appOption.vmBaseDir, bundleVmDir)
     AppStorage.setOrCreate(appOption.kernel, bundleVmDir + '/kernel_aarch64')
