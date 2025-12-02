@@ -102,7 +102,7 @@
     },
     {
       "name": "setting_reset_linux_desc",
-      "value": "Reset linux system to initial"
+      "value": "Reset system to initial"
     },
     {
       "name": "setting_keep_screen_on",
@@ -114,11 +114,11 @@
     },
     {
       "name": "setting_reset_linux_content",
-      "value": "Data in Linux will be cleared and HiSH will restart, continue?"
+      "value": "Data in Navidrome will be cleared and HiSH will restart, continue?"
     },
     {
       "name": "setting_reset_linux_title",
-      "value": "Are you sure to reset Linux?"
+      "value": "Are you sure to reset?"
     },
     {
       "name": "setting_reset_linux_reset",
@@ -162,11 +162,11 @@
     },
     {
       "name": "empty_shared_folder_prompt",
-      "value": "Click the Add at top right to add files to shared folder\nThen you can access it in /mnt/share of HiSH"
+      "value": "Click the Add at top right to add files to shared folder\nThen you can access it in /mnt/share of Navidrome"
     },
     {
       "name": "restart_hish_to_apply_changes",
-      "value": "Port mapping saved, will applied after HiSH restarted"
+      "value": "Port mapping saved, will applied after restarted"
     },
     {
       "name": "copy_text",
@@ -227,6 +227,10 @@
     {
       "name": "import_file_to_music",
       "value": "导入到音乐库"
+    },
+    {
+      "name": "setting_keep_background",
+      "value": "模拟后台运行"
     }
   ]
 }

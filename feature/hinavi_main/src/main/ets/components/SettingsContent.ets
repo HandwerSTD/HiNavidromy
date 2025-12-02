@@ -68,6 +68,7 @@ export default struct SettingsContent {
   @Watch('saveVmMemSize') @StorageProp(appOption.memSizeName) vmMemSize: number = 512
   @Watch('saveKeepScreenOn') @StorageProp(appOption.keepScreenOn) keepScreenOn: boolean = false
   @Watch('saveSimulateBg') @StorageProp(appOption.simulateBg) simulateBg: boolean = false
+  @Watch('saveDeveloperMode') @StorageProp(appOption.developerMode) developerMode: boolean = false
 
   @StorageProp('bundleInfo') bundleInfo?: bundleManager.BundleInfo = undefined
   @StorageProp('versionCode') versionCode: number = 0
@@ -164,6 +165,11 @@ export default struct SettingsContent {
     }
   }
 
+  saveDeveloperMode() {
+    this.preferences!.put(appOption.developerMode, this.developerMode)
+    this.preferences!.flush()
+  }
+
   @Builder
   private cpuSetting() {
     Select(this.cpuOptions)
@@ -194,6 +200,15 @@ export default struct SettingsContent {
       .select(this.simulateBg)
       .onChange((value: boolean) => {
         AppStorage.setOrCreate(appOption.simulateBg, value)
+      })
+  }
+
+  @Builder
+  private developerModeSetting() {
+    Checkbox()
+      .select(this.developerMode)
+      .onChange((value: boolean) => {
+        AppStorage.setOrCreate(appOption.developerMode, value)
       })
   }
 
@@ -251,6 +266,16 @@ export default struct SettingsContent {
               .onClick(() => {
                 AppStorage.setOrCreate(appOption.simulateBg, !this.simulateBg)
               })
+            // SettingItem({
+            //   title: '开发者模式',
+            //   subTitle: '开启后暴露终端入口',
+            //   content: () => {
+            //     this.developerModeSetting()
+            //   }
+            // })
+            //   .onClick(() => {
+            //     AppStorage.setOrCreate(appOption.developerMode, !this.developerMode)
+            //   })
           }
 
           BlockTitle({ content: $r('app.string.setting_block_about') })

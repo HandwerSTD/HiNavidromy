@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "compat_mode_test",
+    "type": "feature",
+    "deviceTypes": [
+      "phone"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false
+  }
+}

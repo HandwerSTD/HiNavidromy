@@ -106,19 +106,19 @@
     },
     {
       "name": "setting_reset_linux",
-      "value": "重置Linux"
+      "value": "重置"
     },
     {
       "name": "setting_reset_linux_desc",
-      "value": "将Linux系统重置为初始状态"
+      "value": "将Navidrome重置为初始状态"
     },
     {
       "name": "setting_reset_linux_title",
-      "value": "确认是否重置Linux"
+      "value": "确认是否重置"
     },
     {
       "name": "setting_reset_linux_content",
-      "value": "重置Linux会清除Linux环境中的数据并立即重启HiSH，是否继续？"
+      "value": "重置会清除Navidrome环境中的数据并立即重启应用，是否继续？"
     },
     {
       "name": "setting_reset_linux_reset",
@@ -134,7 +134,7 @@
     },
     {
       "name": "setting_shared_folder_desc",
-      "value": "在设备和Linux之间传输文件"
+      "value": "在设备和Navidrome之间传输文件"
     },
     {
       "name": "import_file_to_shared_folder",
@@ -166,7 +166,7 @@
     },
     {
       "name": "empty_shared_folder_prompt",
-      "value": "点击右上角添加文件至共享文件夹\n即可在HiSH的/mnt/share下进行访问"
+      "value": "点击右上角添加文件至共享文件夹\n即可在Navidrome的/mnt/share下进行访问"
     },
     {
       "name": "restart_hish_to_apply_changes",
@@ -227,6 +227,10 @@
     {
       "name": "import_file_to_music",
       "value": "导入到音乐库"
+    },
+    {
+      "name": "setting_keep_background",
+      "value": "模拟后台运行"
     }
   ]
 }

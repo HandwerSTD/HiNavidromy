@@ -252,6 +252,22 @@ export struct UsefulTerminalView {
             }).onClick(() => {
               VMUtils.suspendAndExecuteCommand('rc-service navidrome status')
             })
+            CommonListItem({
+              icon: $r('sys.symbol.list_checkmask'),
+              title: '查看 Navidrome 配置文件',
+              subtitle: 'cat /etc/navidrome/navidrome.toml',
+              isCompose: true
+            }).onClick(() => {
+              VMUtils.suspendAndExecuteCommand('cat /etc/navidrome/navidrome.toml')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.list_checkmask'),
+              title: '编辑 Navidrome 配置文件(按[ESC], [:q]或[:wq], [ENTER])退出',
+              subtitle: 'vi /etc/navidrome/navidrome.toml',
+              isCompose: true
+            }).onClick(() => {
+              VMUtils.suspendAndExecuteCommand('vi /etc/navidrome/navidrome.toml')
+            })
           }
         }
 

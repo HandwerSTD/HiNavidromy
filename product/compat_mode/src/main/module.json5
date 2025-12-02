@@ -1,12 +1,11 @@
 {
   "module": {
-    "name": "full_mode",
+    "name": "compat_mode",
     "type": "entry",
     "description": "$string:module_desc",
-    "mainElement": "EntryAbility",
+    "mainElement": "CompatEntryAbility",
     "deviceTypes": [
-      "tablet",
-      "2in1",
+      "phone"
     ],
     "requestPermissions": [
       {
@@ -23,14 +22,14 @@
         "usedScene": {
           "when": "inuse"
         },
-        "reason": "$string:setting_keep_screen_on_desc"
+        "reason": "$string:setting_keep_background"
       },
       {
         "name": "ohos.permission.APPROXIMATELY_LOCATION",
         "usedScene": {
           "when": "inuse"
         },
-        "reason": "$string:setting_keep_screen_on_desc"
+        "reason": "$string:setting_keep_background"
       }
     ],
     "deliveryWithInstall": true,
@@ -38,11 +37,11 @@
     "pages": "$profile:main_pages",
     "abilities": [
       {
-        "name": "EntryAbility",
-        "srcEntry": "./ets/entryability/EntryAbility.ets",
-        "description": "$string:EntryAbility_desc",
+        "name": "CompatEntryAbility",
+        "srcEntry": "./ets/compatentryability/CompatEntryAbility.ets",
+        "description": "$string:CompatEntryAbility_desc",
         "icon": "$media:layered_image",
-        "label": "$string:EntryAbility_label",
+        "label": "$string:CompatEntryAbility_label",
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
@@ -52,13 +51,27 @@
               "entity.system.home"
             ],
             "actions": [
-              "action.system.home"
+              "ohos.want.action.home"
             ]
           }
         ],
         "backgroundModes": [
           "location"
         ]
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "Compat_modeBackupAbility",
+        "srcEntry": "./ets/compat_modebackupability/Compat_modeBackupAbility.ets",
+        "type": "backup",
+        "exported": false,
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ],
       }
     ]
   }

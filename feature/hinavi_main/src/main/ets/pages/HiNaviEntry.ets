@@ -210,32 +210,34 @@ export struct HiNaviEntry {
             })
           })
       }
-      ListItem() {
-        CommonItemContainer() {
-          CommonListItem({
-            // icon: $r('sys.symbol.text_alignleft'),
-            title: '终端管理',
-            isCompose: true
-          }) {}
-          if (GlobalStore.isServerOnline) {
+      if (GlobalStore.developerMode) {
+        ListItem() {
+          CommonItemContainer() {
             CommonListItem({
-              icon: $r('sys.symbol.bolt_fill'),
-              title: '常用功能',
+              // icon: $r('sys.symbol.text_alignleft'),
+              title: '终端管理',
               isCompose: true
-            }).onClick(() => {
-              GlobalStore.pageStack.pushPathByName('CommonCommands',[])
+            }) {}
+            if (GlobalStore.isServerOnline) {
+              CommonListItem({
+                icon: $r('sys.symbol.bolt_fill'),
+                title: '常用功能',
+                isCompose: true
+              }).onClick(() => {
+                GlobalStore.pageStack.pushPathByName('CommonCommands',[])
+              })
+            }
+            CommonListItem({
+              icon: $r('sys.symbol.rectangle_stack'),
+              title: '实时终端',
+              isCompose: true
             })
-          }
-          CommonListItem({
-            icon: $r('sys.symbol.rectangle_stack'),
-            title: '实时终端',
-            isCompose: true
-          })
-            .onClick(() => {
-              GlobalStore.showTerminal = true
-            })
-          if (!GlobalStore.showTerminal) {
-            WebTerminal().height(1).clip(true).opacity(0).hitTestBehavior(HitTestMode.Block)
+              .onClick(() => {
+                GlobalStore.showTerminal = true
+              })
+            if (!GlobalStore.showTerminal) {
+              WebTerminal().height(1).clip(true).opacity(0).hitTestBehavior(HitTestMode.Block)
+            }
           }
         }
       }

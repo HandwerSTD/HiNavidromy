@@ -16,6 +16,7 @@ class appOption {
   static portUsedByOthers = 'portUsedByOthers'
   static simulateBg = 'simulateBg'
   static firstOpenCompleted = 'firstOpenCompleted'
+  static developerMode = 'developerMode'
 }
 
 interface PortMapping {

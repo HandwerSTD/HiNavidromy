@@ -1,0 +1,12 @@
+{
+  "name": "compat_mode",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "hinavi_main": "file:../../feature/hinavi_main"
+  }
+}
+

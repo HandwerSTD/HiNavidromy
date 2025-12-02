@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "CompatEntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "CompatEntryAbility_label",
+      "value": "HiNavidromy"
+    }
+  ]
+}
