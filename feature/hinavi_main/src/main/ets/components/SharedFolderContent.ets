@@ -1,4 +1,4 @@
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, zlib } from '@kit.BasicServicesKit';
 import { Want, common, wantConstant } from "@kit.AbilityKit"
 import { fileUri, picker } from '@kit.CoreFileKit';
 import { fileIo as fs } from '@kit.CoreFileKit'
@@ -43,6 +43,11 @@ export struct SharedFolderContent {
   removeProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
       content: '删除文件中',
+    }),
+  })
+  backupProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '正在备份音乐库...',
     }),
   })
   createFolderController = new CustomDialogController({
@@ -251,7 +256,7 @@ export struct SharedFolderContent {
           .margin({ right: 5 })
           .onClick(() => this.refreshFileList())
 
-        SymbolGlyph($r('sys.symbol.dot_grid_1x2'))
+        SymbolGlyph($r('sys.symbol.add_songlist'))
           .fontSize(24)
           .fontColor([$r('sys.color.icon_secondary')])
           .padding(4)
@@ -275,7 +280,11 @@ export struct SharedFolderContent {
             action: () => {
               this.importFileToCurrent(true)
             }
-            // TODO: 备份音乐库
+          }, {
+            value: '备份音乐库',
+            action: () => {
+              this.backupMusicLibrary()
+            }
           }])
       }
       .height(56)
@@ -416,6 +425,84 @@ export struct SharedFolderContent {
       }
     })
   }
+
+  private async backupMusicLibrary() {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    const musicPath = [this.host, 'music'].join('/');
+
+    // 检查music文件夹是否存在
+    try {
+      const stat = fs.statSync(musicPath);
+      if (!stat.isDirectory()) {
+        this.promptAction.showToast({ message: '音乐库文件夹不存在' });
+        return;
+      }
+    } catch (e) {
+      this.promptAction.showToast({ message: '音乐库文件夹不存在' });
+      return;
+    }
+
+    // 生成带时间戳的zip文件名
+    const timestamp = new Date();
+    const dateStr = `${timestamp.getFullYear()}${String(timestamp.getMonth() + 1).padStart(2, '0')}${String(timestamp.getDate()).padStart(2, '0')}_${String(timestamp.getHours()).padStart(2, '0')}${String(timestamp.getMinutes()).padStart(2, '0')}${String(timestamp.getSeconds()).padStart(2, '0')}`;
+    const zipFileName = `music_backup_${dateStr}.zip`;
+
+    // 拉起picker选择保存位置
+    const options = new picker.DocumentSaveOptions();
+    options.newFileNames = [zipFileName];
+
+    const savePicker = new picker.DocumentViewPicker(context);
+    let uris: string[];
+    try {
+      uris = await savePicker.save(options);
+    } catch (e) {
+      console.log('error saving file', e);
+      return;
+    }
+
+    if (uris.length === 0) {
+      return;
+    }
+
+    const destUri = uris[0];
+
+    this.backupProgress.open();
+    try {
+      // 在临时目录创建zip文件
+      const tempZipPath = context.tempDir + '/' + zipFileName;
+
+      // 使用zlib压缩music文件夹
+      const zipOptions: zlib.Options = {
+        level: zlib.CompressLevel.COMPRESS_LEVEL_DEFAULT_COMPRESSION
+      };
+
+      await zlib.compressFile(musicPath, tempZipPath, zipOptions);
+
+      // 将临时zip文件复制到用户选择的位置
+      await copyFile(tempZipPath, destUri);
+
+      // 删除临时文件
+      try {
+        await fs.unlink(tempZipPath);
+      } catch (e) {
+        console.log('error deleting temp zip file', e);
+      }
+
+      this.promptAction.showToast({
+        message: '音乐库备份成功',
+        duration: 3000
+      });
+    } catch (e) {
+      console.log('error backing up music library', e);
+      this.promptAction.showToast({
+        message: '备份失败: ' + (e as BusinessError).message,
+        duration: 3000
+      });
+    } finally {
+      this.backupProgress.close();
+    }
+  }
+
   private deleteFileOrFolder(name: string, type: Type) {
     const typeStr = type === Type.File ? '文件' : '文件夹'
     this.getUIContext().showAlertDialog({

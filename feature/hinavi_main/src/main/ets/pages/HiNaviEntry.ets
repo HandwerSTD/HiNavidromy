@@ -77,7 +77,7 @@ export struct HiNaviEntry {
       password: 'localhostPurePlay'
     } as NavidromeRequestContext))
     const data = Base64Util.encodeToStrSync(raw_data)
-    return `https://handwer.space/cloudpureplay/share?action=shareConfig&type=plain&api=Navidrome&data=${data}`
+    return `https://handwer.space/cloudpureplay?action=shareConfig&type=plain&api=Navidrome&data=${data}`
   }
   @Builder PageMap(name: string) {
     if (name === 'MusicFolder') {
