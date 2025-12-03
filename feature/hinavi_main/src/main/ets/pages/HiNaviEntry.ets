@@ -15,6 +15,7 @@ import { UsefulTerminalView } from '../hinavi/views/UsefulTerminalView'
 import { FirstOpenPage } from './FirstOpenPages/FirstOpenPage'
 import { VMSwitcher } from '../lib/VMSwitcher'
 import { ServiceInitUtils } from '../../../../Index'
+import { MiscUtils } from '../common/utils/Misc'
 
 export interface NavidromeRequestContext {
   baseUrl: string; // Navidrome API 根地址
@@ -76,7 +77,7 @@ export struct HiNaviEntry {
       password: 'localhostPurePlay'
     } as NavidromeRequestContext))
     const data = Base64Util.encodeToStrSync(raw_data)
-    return `cloudpureplay://shareConfig/share?type=plain&api=Navidrome&data=${data}`
+    return `https://handwer.space/cloudpureplay/share?action=shareConfig&type=plain&api=Navidrome&data=${data}`
   }
   @Builder PageMap(name: string) {
     if (name === 'MusicFolder') {
@@ -121,7 +122,7 @@ export struct HiNaviEntry {
       ListItem() {
         CommonListItem({
           icon: $r('sys.symbol.camera_mode_slow'),
-          title: '您正在以兼容模式运行，Navidrome 性能可能会受到影响',
+          title: '您正在以兼容模式运行，Navidrome 运行可能会显著变慢',
           subtitle: '点击查看说明'
         }).onClick(() => {
           this.getUIContext().showAlertDialog({
@@ -129,11 +130,11 @@ export struct HiNaviEntry {
             message: 'HiNavidromy 正在以兼容模式运行，此模式下内部代码会经过一层转译，因此运行速度可能显著变慢。进入兼容模式的原因可能有：\n' +
               '1. 由于权限限制，部分设备在 AppGallery 应用市场安装时，仅支持兼容模式运行\n' +
               '2. 您的设备开启了「坚盾守护模式」，此模式下应用运行权限受限，仅能使用兼容模式运行\n' +
-              '对于第一种情况，您可以自行构建开源版本，并使用开发者模式进行运行。',
+              '对于第一种情况，您可以自行构建开源版本，并使用开发者模式安装，可不经过转译高速运行，同时也可提升性能与耗电表现。',
             primaryButton: {
               value: '去查看开源仓库',
               action: () => {
-                WantUtil.toWebBrowser('https://github.com/HandwerSTD/hinavidromy')
+                MiscUtils.openSourceRepo(this.getUIContext())
               }
             },
             secondaryButton: {
@@ -223,13 +224,18 @@ export struct HiNaviEntry {
           })
       }
       ListItem() {
-        CommonListItem({
-          icon: $r('sys.symbol.gearshape'),
-          title: '应用设置'
-        })
-          .onClick(() => {
-            GlobalStore.pageStack.pushPathByName('Settings',[])
+        Column(){
+          CommonListItem({
+            icon: $r('sys.symbol.gearshape'),
+            title: '应用设置'
           })
+            .onClick(() => {
+              GlobalStore.pageStack.pushPathByName('Settings',[])
+            })
+          if (!GlobalStore.showTerminal) {
+            WebTerminal().height(1).clip(true).opacity(0).hitTestBehavior(HitTestMode.Block)
+          }
+        }
       }
       if (GlobalStore.isServerOnline) {
         ListItem() {
@@ -268,21 +274,69 @@ export struct HiNaviEntry {
                 title: '常用功能',
                 isCompose: true
               }).onClick(() => {
-                GlobalStore.pageStack.pushPathByName('CommonCommands',[])
+                this.getUIContext().showAlertDialog({
+                  title: '终端管理',
+                  message: '终端仅提供给高级用户进行自定义操作，不当操作可能会导致 Navidrome 服务器损坏、数据丢失甚至您的设备损坏，在执行前请确保你知道自己在做什么。对于不当使用终端导致的软件、硬件损坏或数据丢失，本软件与开发者对此不负任何责任。',
+                  primaryButton: {
+                    action:  ()=>{
+                      GlobalStore.pageStack.pushPathByName('CommonCommands',[])
+                    },
+                    value: $r('sys.string.general_confirm')
+                  },
+                  secondaryButton: {
+                    action: ()=>{},
+                    value: $r('sys.string.general_cancel')
+                  }
+                })
               })
             }
             CommonListItem({
               icon: $r('sys.symbol.rectangle_stack'),
-              title: '实时终端',
+              title: '终端管理',
               isCompose: true
             })
               .onClick(() => {
-                GlobalStore.showTerminal = true
+                this.getUIContext().showAlertDialog({
+                  title: '实时终端',
+                  message: '终端仅提供给高级用户进行自定义操作，不当操作可能会导致 Navidrome 服务器损坏、数据丢失甚至您的设备损坏，在执行前请确保你知道自己在做什么。对于不当使用终端导致的软件、硬件损坏或数据丢失，本软件与开发者对此不负任何责任。',
+                  primaryButton: {
+                    action:  ()=>{
+                      GlobalStore.showTerminal = true
+                    },
+                    value: $r('sys.string.general_confirm')
+                  },
+                  secondaryButton: {
+                    action: ()=>{},
+                    value: $r('sys.string.general_cancel')
+                  }
+                })
               })
-            if (!GlobalStore.showTerminal) {
-              WebTerminal().height(1).clip(true).opacity(0).hitTestBehavior(HitTestMode.Block)
-            }
           }
+        }
+      }
+      ListItem() {
+        CommonItemContainer() {
+          CommonListItem({
+            icon: $r('sys.symbol.doc_text_badge_magnifyingglass'),
+            title: '重新查看新手引导',
+            isCompose: true
+          }).onClick(() => {
+            this.showFirstStart = true
+          })
+          CommonListItem({
+            icon: $r('sys.symbol.doc_plaintext_and_pencil'),
+            title: '加入交流群',
+            isCompose: true
+          }).onClick(() => {
+            WantUtil.toWebBrowser('https://qm.qq.com/q/6Gn9dWgmME')
+          })
+          CommonListItem({
+            icon: $r('sys.symbol.lightbulb_max'),
+            title: '开源仓库',
+            isCompose: true
+          }).onClick(() => {
+            MiscUtils.openSourceRepo(this.getUIContext())
+          })
         }
       }
     }
@@ -322,6 +376,7 @@ export struct HiNaviEntry {
       .height('100%')
       .navDestination(this.PageMap)
       .title('HiNavidromy')
+      .navBarWidth('40%')
       .backgroundColor($r('sys.color.background_secondary'))
       .expandSafeArea()
       .bindSheet(this.showFirstStart!!, this.FirstStart(), {

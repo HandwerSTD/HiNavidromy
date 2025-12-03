@@ -25,11 +25,12 @@ class ServiceInitUtils {
     } else {
       VMSwitcher.isTCI = false;
     }
-    if (VMSwitcher.isTCI || !DEBUG) {
-      GlobalStore.developerMode = false;
-    } else {
-      GlobalStore.developerMode = true
-    }
+    // if (VMSwitcher.isTCI || !DEBUG) {
+    //   GlobalStore.developerMode = false;
+    // } else {
+    //   GlobalStore.developerMode = true
+    // }
+    GlobalStore.developerMode = true
 
     const appContext = context.getApplicationContext();
     const appPref: preference.Preferences = await preference.getPreferences(appContext, appOption.preferenceName);

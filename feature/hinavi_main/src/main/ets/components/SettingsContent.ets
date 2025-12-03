@@ -11,6 +11,7 @@ import { geoLocationManager } from '@kit.LocationKit';
 import { PermissionUtil } from '@pura/harmony-utils';
 import { CommonItemContainer } from './component_library/CommonListItem';
 import GlobalStore from '../common/statemgmt/GlobalStore';
+import { MiscUtils } from '../common/utils/Misc';
 
 const cpuOptions: number[] = [1, 2, 4, 6, 8, 10, 16, 24, 32]
 const memOptions: number[] = [512, 1024, 2 * 1024, 4 * 1024, 6 * 1024, 8 * 1024, 12 * 1024, 16 * 1024]
@@ -287,7 +288,7 @@ export default struct SettingsContent {
               icon: $r('sys.symbol.house'),
               title: $r('app.string.code_repository'),
               click: () => {
-                this.toWebBrowser('https://github.com/HandwerSTD/hinavidromy')
+                MiscUtils.openSourceRepo(this.getUIContext())
               }
             })
 
