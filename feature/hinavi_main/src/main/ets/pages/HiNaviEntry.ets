@@ -216,7 +216,7 @@ export struct HiNaviEntry {
           icon: $r('sys.symbol.globe_badge_heart'),
           title: 'Navidrome 主页'
         }).onClick(() => {
-          GlobalStore.pageStack.pushPathByName('NavidromeWeb', [])
+          GlobalStore.pageStack.push('NavidromeWeb', [])
         })
       }
       ListItem() {
@@ -225,7 +225,7 @@ export struct HiNaviEntry {
           title: '音乐文件管理'
         })
           .onClick(() => {
-            GlobalStore.pageStack.pushPathByName('MusicFolder',[])
+            GlobalStore.pageStack.push('MusicFolder',[])
           })
       }
       ListItem() {
@@ -235,36 +235,36 @@ export struct HiNaviEntry {
             title: '应用设置'
           })
             .onClick(() => {
-              GlobalStore.pageStack.pushPathByName('Settings',[])
+              GlobalStore.pageStack.push('Settings',[])
             })
           if (!GlobalStore.showTerminal) {
             WebTerminal().height(1).clip(true).opacity(0).hitTestBehavior(HitTestMode.Block)
           }
         }
       }
-      if (GlobalStore.isServerOnline) {
-        ListItem() {
-          Button('正常关机').width('100%').backgroundColor($r('sys.color.warning'))
-            .onClick(() => {
-              this.getUIContext().showAlertDialog({
-                message: '确定要关机吗？',
-                primaryButton: {
-                  value: $r('sys.string.general_confirm'),
-                  fontColor: $r('sys.color.warning'),
-                  action: () => {
-                    this.showTerminal = true
-                    VMUtils.suspendAndExecuteCommand('poweroff')
-                  }
-                },
-                secondaryButton: {
-                  value: $r('sys.string.general_cancel'),
-                  // fontColor: $r('sys.color.warning'),
-                  action: () => {}
-                }
-              })
-            })
-        }
-      }
+      // if (GlobalStore.isServerOnline) {
+      //   ListItem() {
+      //     Button('正常关机').width('100%').backgroundColor($r('sys.color.warning'))
+      //       .onClick(() => {
+      //         this.getUIContext().showAlertDialog({
+      //           message: '确定要关机吗？',
+      //           primaryButton: {
+      //             value: $r('sys.string.general_confirm'),
+      //             fontColor: $r('sys.color.warning'),
+      //             action: () => {
+      //               this.showTerminal = true
+      //               VMUtils.suspendAndExecuteCommand('poweroff')
+      //             }
+      //           },
+      //           secondaryButton: {
+      //             value: $r('sys.string.general_cancel'),
+      //             // fontColor: $r('sys.color.warning'),
+      //             action: () => {}
+      //           }
+      //         })
+      //       })
+      //   }
+      // }
       if (GlobalStore.developerMode) {
         ListItem() {
           CommonItemContainer() {
@@ -284,7 +284,7 @@ export struct HiNaviEntry {
                   message: '终端仅提供给高级用户进行自定义操作，不当操作可能会导致 Navidrome 服务器损坏、数据丢失甚至您的设备损坏，在执行前请确保你知道自己在做什么。对于不当使用终端导致的软件、硬件损坏或数据丢失，本软件与开发者对此不负任何责任。',
                   primaryButton: {
                     action:  ()=>{
-                      GlobalStore.pageStack.pushPathByName('CommonCommands',[])
+                      GlobalStore.pageStack.push('CommonCommands',[])
                     },
                     value: $r('sys.string.general_confirm')
                   },

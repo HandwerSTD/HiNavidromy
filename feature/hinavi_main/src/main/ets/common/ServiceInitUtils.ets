@@ -67,6 +67,10 @@ class ServiceInitUtils {
           promptAction.openToast({
             message: '后台模拟启动成功'
           })
+          preference.getPreferences(context, appOption.preferenceName)
+            .then((pref) => {
+              return pref.put(appOption.simulateBg, true)
+            })
           AppStorage.set(appOption.simulateBg, true)
           GlobalStore.simulateBg = true
           return true;

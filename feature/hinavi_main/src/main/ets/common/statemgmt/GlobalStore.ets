@@ -5,6 +5,16 @@ import { common } from "@kit.AbilityKit"
 import { ServerLoadStatus } from "../utils/NavidromeServerUtils"
 
 
+class MyPageStack extends NavPathStack {
+  push(name: string, params: Object) {
+    if (this.getAllPathName().length == 1) {
+      this.replacePathByName(name, params, true);
+      return;
+    }
+    this.pushPathByName(name, params, true);
+  }
+}
+
 @ObservedV2
 class GlobalStore {
 
@@ -17,7 +27,7 @@ class GlobalStore {
     return GlobalStore._instance
   }
 
-  pageStack: NavPathStack = new NavPathStack()
+  pageStack: MyPageStack = new MyPageStack()
 
   @Trace gotUpdateDeviceId?: string
 
