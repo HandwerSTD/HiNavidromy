@@ -8,6 +8,7 @@ import validateFolderName from '../lib/validateFolderName'
 import { util } from "@kit.ArkTS";
 import appOption from '../model/appOption';
 import { VMUtils } from '../common/utils/NavidromeServerUtils';
+import { NavidromeRequestUtil } from '../common/utils/NavidromeRequest';
 
 enum Type {
   Folder = 0,
@@ -374,6 +375,14 @@ export struct SharedFolderContent {
     }
     this.importProgress.close()
     VMUtils.suspendAndExecuteCommand('chmod -R o+rwx /mnt/share', false)
+    if (forceMusicFolder) {
+      setTimeout(async () => {
+        await NavidromeRequestUtil.refreshLibrary()
+        promptAction.openToast({
+          message: '已通知 Navidrome 扫描音乐库'
+        })
+      }, 2000)
+    }
   }
 
   async createFolderToCurrent(dest_name?: string) {
@@ -551,7 +560,7 @@ export struct SharedFolderContent {
     const names = await fs.listFile(dir);
     this.files = names
       .filter(it => {
-        return it !== '.virtfs_metadata' && it !== '.virtfs_metadata_root'
+        return it !== '.virtfs_metadata' && it !== '.virtfs_metadata_root' && it !== '.hinavi_tmp'
       })
       .map((it) => {
         const full = dir + '/' + it;

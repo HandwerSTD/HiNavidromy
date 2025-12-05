@@ -3,6 +3,7 @@ import { common } from "@kit.AbilityKit";
 import { AegStrUtil } from "@hw-agconnect/petal-aegis";
 import { Base64Util } from "@pura/harmony-utils";
 import { NavidromeRequestContext } from "../HiNaviEntry";
+import { MiscUtils } from "../../common/utils/Misc";
 
 @ComponentV2
 export struct CloudPurePlay {
@@ -30,7 +31,9 @@ export struct CloudPurePlay {
       buttonFooterText: '拉起云净听导入配置文件',
       useButtonFooter: true,
       buttonFooterOnClick: () => {
-        (this.getUIContext().getHostContext()! as common.UIAbilityContext).openLink(this.sharePlainAPILink())
+        MiscUtils.requestForceBg(this.getUIContext(), () => {
+          (this.getUIContext().getHostContext()! as common.UIAbilityContext).openLink(this.sharePlainAPILink())
+        })
       }
     })
   }

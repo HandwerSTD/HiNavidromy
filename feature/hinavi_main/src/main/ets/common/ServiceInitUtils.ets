@@ -49,15 +49,15 @@ class ServiceInitUtils {
       await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
     AppStorage.setOrCreate('bundleInfo', bundleInfo)
   }
-  async startSimulateBg(context: common.UIAbilityContext, force: boolean = false) {
+  async startSimulateBg(context: common.UIAbilityContext, force: boolean = false): Promise<boolean> {
     if (AppStorage.get<boolean>(appOption.simulateBg) || force) {
-      PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
+      return PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
         .then((res) => {
           if (!res) {
             promptAction.openToast({
               message: '请授予权限'
             })
-            return;
+            return false;
           }
           geoLocationManager.on("locationChange", {
             interval: 10,
@@ -69,8 +69,10 @@ class ServiceInitUtils {
           })
           AppStorage.set(appOption.simulateBg, true)
           GlobalStore.simulateBg = true
+          return true;
         })
     }
+    return false;
   }
 
   // ----------------------------------------------------------

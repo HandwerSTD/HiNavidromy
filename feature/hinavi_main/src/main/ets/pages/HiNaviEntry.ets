@@ -16,6 +16,7 @@ import { FirstOpenPage } from './FirstOpenPages/FirstOpenPage'
 import { VMSwitcher } from '../lib/VMSwitcher'
 import { ServiceInitUtils } from '../../../../Index'
 import { MiscUtils } from '../common/utils/Misc'
+import { CommonConst } from '../common/constants/CommonConsts'
 
 export interface NavidromeRequestContext {
   baseUrl: string; // Navidrome API 根地址
@@ -122,13 +123,13 @@ export struct HiNaviEntry {
       ListItem() {
         CommonListItem({
           icon: $r('sys.symbol.camera_mode_slow'),
-          title: '您正在以兼容模式运行，Navidrome 运行可能会显著变慢',
+          title: '正在以兼容模式运行，Navidrome 运行速度将显著变慢，推荐使用开源版本以提升性能',
           subtitle: '点击查看说明'
         }).onClick(() => {
           this.getUIContext().showAlertDialog({
             title: '兼容模式',
             message: 'HiNavidromy 正在以兼容模式运行，此模式下内部代码会经过一层转译，因此运行速度可能显著变慢。进入兼容模式的原因可能有：\n' +
-              '1. 由于权限限制，部分设备在 AppGallery 应用市场安装时，仅支持兼容模式运行\n' +
+              '1. 由于权限限制，在 AppGallery 应用市场安装时，仅支持兼容模式运行\n' +
               '2. 您的设备开启了「坚盾守护模式」，此模式下应用运行权限受限，仅能使用兼容模式运行\n' +
               '对于第一种情况，您可以自行构建开源版本，并使用开发者模式安装，可不经过转译高速运行，同时也可提升性能与耗电表现。',
             primaryButton: {
@@ -194,14 +195,18 @@ export struct HiNaviEntry {
               title: '快速启动云净听',
               isCompose: true,
             }).onClick(() => {
+              MiscUtils.requestForceBg(this.getUIContext(), () => {
               (this.getUIContext().getHostContext()! as common.UIAbilityContext).openLink('https://handwer.space/cloudpureplay')
+              })
             })
             CommonListItem({
               icon: $r('sys.symbol.arrowshape_up'),
               title: '拉起云净听添加配置',
               isCompose: true,
             }).onClick(() => {
+              MiscUtils.requestForceBg(this.getUIContext(), () => {
               (this.getUIContext().getHostContext()! as common.UIAbilityContext).openLink(this.sharePlainAPILink())
+              })
             })
           }
         }.transition(TransitionEffect.OPACITY.animation({duration: 300}))
@@ -382,7 +387,8 @@ export struct HiNaviEntry {
       .bindSheet(this.showFirstStart!!, this.FirstStart(), {
         showClose: false, onWillDismiss: (action) => {
           if (!this.showFirstStart) action.dismiss()
-        },backgroundColor: $r('sys.color.ohos_id_color_panel_bg')
+        },backgroundColor: $r('sys.color.ohos_id_color_panel_bg'),
+        preferType: SheetType.CENTER
       })
     }.bindSheet(GlobalStore.showTerminal!!, this.WebTerm(), {
       showClose: false,backgroundColor: $r('sys.color.ohos_id_color_panel_bg'),
@@ -398,7 +404,21 @@ export struct HiNaviEntry {
       title: '服务器连接超时',
       message: '无法连接到位于 localhost:4533 的服务器，可能有以下原因：\n' +
         '1. 向外部端口映射失败或 4533 端口被占用\n' +
-        '2. 虚拟机内服务器启动失败',
+        '2. 虚拟机内服务器启动失败\n' +
+        '如果您不知道为什么会这样，可以选择重启应用，在大多数情况下会恢复正常',
+      primaryButton: {
+        value: '重启应用',
+        action: () => {
+          (this.getUIContext().getHostContext()!).getApplicationContext().restartApp({
+            bundleName: CommonConst.bundleName,
+            abilityName: CommonConst.fullModeAbility
+          })
+        }
+      },
+      secondaryButton: {
+        value: $r('sys.string.general_confirm'),
+        action: () => {}
+      }
     })
   }
 }

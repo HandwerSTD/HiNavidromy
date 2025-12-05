@@ -3,6 +3,7 @@ import { ServerLoadStatus } from '../../common/utils/NavidromeServerUtils'
 import { ImageTitleWelcomeTemplate } from './CommonTemplate'
 import { NavServer } from './NavServer'
 import { FinalWelcome, OpenWelcome } from './OpenWelcome'
+import { CompatibilityMode } from './CompatibilityMode'
 import { WaitForServer } from './WaitForServer'
 import { HdsNavigation } from '@hms.hds.hdsBaseComponent'
 import { SharedFolderContent } from '../../components/SharedFolderContent'
@@ -10,6 +11,7 @@ import { NavidromeWeb } from '../../hinavi/views/NavidromeWeb'
 import { ImportMusic } from './ImportMusic'
 import { NavWebPage } from './NavWebPage'
 import { CloudPurePlay } from './CloudPurePlay'
+import { VMSwitcher } from '../../lib/VMSwitcher'
 
 @ComponentV2
 export struct FirstOpenPage {
@@ -33,6 +35,9 @@ export struct FirstOpenPage {
         Navigation(this.pageStack) {
           Swiper() {
             OpenWelcome()
+            if (VMSwitcher.isTCI) {
+              CompatibilityMode()
+            }
             NavServer()
             ImportMusic()
             NavWebPage()
