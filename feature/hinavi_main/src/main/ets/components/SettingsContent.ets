@@ -329,7 +329,7 @@ export default struct SettingsContent {
   buildAboutMe() {
     Column({space: 12}) {
 
-      LiqD()
+      // LiqD()
 
       Row({space: 24}) {
         Image($r('app.media.startIcon'))

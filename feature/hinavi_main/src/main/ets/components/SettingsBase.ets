@@ -34,11 +34,11 @@ export struct ItemTitle {
   }
 }
 
-@Component
+@ComponentV2
 export struct SettingItem {
-  @Prop title: string | Resource
-  @Prop subTitle: string | Resource
-  @Prop icon: Resource | undefined
+  @Param @Require title: string | Resource
+  @Param @Require subTitle: string | Resource
+  @Param icon: Resource | undefined = undefined
   @BuilderParam content?: () => void
 
   build() {
