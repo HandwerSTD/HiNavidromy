@@ -2,8 +2,8 @@
   "app": {
     "bundleName": "top.handwer.hish.hinavidromy",
     "vendor": "handwer",
-    "versionCode": 1020400,
-    "versionName": "1.2.4",
+    "versionCode": 1020500,
+    "versionName": "1.2.5",
     "icon": "$media:app_layered_image",
     "label": "$string:app_name"
   }

@@ -23,6 +23,7 @@ export default class EntryAbility extends UIAbility {
     const pref = await preferences.getPreferences(this.context.getApplicationContext(), appOption.preferenceName)
     const firstOpenCompleted = await pref.get(appOption.firstOpenCompleted, false) as boolean
     let jumpPage = 'pages/HiNaviEntry'
+    // TODO: 如果距离上次强杀时间过短的话，先把用户导到这个页面里冷静几秒，保证虚拟机顺利开机
     if (!firstOpenCompleted) jumpPage = 'pages/FirstOpenPlaceholder'
 
     windowStage.loadContent(jumpPage, (err) => {
