@@ -180,7 +180,7 @@ export class MyLogUtil {
   static infoHere(ctx: object, method: string, info: string) {
     const cls = (ctx as any)?.constructor?.name ?? "<anonymous>";
     const parent = Object.getPrototypeOf((ctx as any)?.constructor)?.name ?? "-";
-    MyLogUtil.info(`${cls}.${method}() [super: ${parent}] >>> ${info}}`);
+    MyLogUtil.info(`${cls}.${method}() [super: ${parent}] >>> ${info}`);
   }
   /**
    * 打印WARN级别日志

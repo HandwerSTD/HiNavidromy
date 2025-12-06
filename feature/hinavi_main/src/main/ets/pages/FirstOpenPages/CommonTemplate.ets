@@ -59,6 +59,9 @@ export struct ImageTitleWelcomeTemplate {
               Button(this.buttonFooterText)
                 .onClick(() => {this.buttonFooterOnClick()})
                 .width('100%')
+                .constraintSize({
+                  maxWidth: 640
+                })
             }
           }.margin(24).justifyContent(FlexAlign.Center)
         }

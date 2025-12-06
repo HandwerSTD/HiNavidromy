@@ -147,7 +147,7 @@ export default struct SettingsContent {
       PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
         .then((res) => {
           if (!res) {
-            promptAction.openToast({
+            promptAction.showToast({
               message: '请授予权限'
             })
             return;
@@ -157,7 +157,7 @@ export default struct SettingsContent {
             locationScenario: geoLocationManager.PowerConsumptionScenario.NO_POWER_CONSUMPTION
           }, () => {})
           BackgroundTaskManager.startContinuousTask(this.getUIContext().getHostContext()! as common.UIAbilityContext)
-          promptAction.openToast({
+          promptAction.showToast({
             message: '启动成功'
           })
         })

@@ -17,6 +17,8 @@ import { VMSwitcher } from '../lib/VMSwitcher'
 import { ServiceInitUtils } from '../../../../Index'
 import { MiscUtils } from '../common/utils/Misc'
 import { CommonConst } from '../common/constants/CommonConsts'
+import { privacyManager } from '@kit.AppGalleryKit'
+import { MyLogUtil } from '../common/utils/Logger'
 
 export interface NavidromeRequestContext {
   baseUrl: string; // Navidrome API 根地址
@@ -42,19 +44,6 @@ export struct HiNaviEntry {
     this.preferences = await preference.getPreferences(this.context.getApplicationContext(), appOption.preferenceName)
     const firstOpenCompleted = await this.preferences.get(appOption.firstOpenCompleted, false) as boolean
     this.showFirstStart = !firstOpenCompleted
-
-    // 初始化假进度条
-    GlobalStore.fakeLoadingProgress = 0
-    const totalDuration = VMSwitcher.isTCI ? 70000 : 10000 // TCI: 70秒, 非TCI: 10秒
-    const intervalMs = 100
-    const increment = 100 / (totalDuration / intervalMs)
-    this.fakeProgressInterval = setInterval(() => {
-      if (GlobalStore.fakeLoadingProgress < 100) {
-        GlobalStore.fakeLoadingProgress = Math.min(100, GlobalStore.fakeLoadingProgress + increment)
-      } else {
-        clearInterval(this.fakeProgressInterval)
-      }
-    }, intervalMs)
 
     NavidromeServerUtils.checkConnectionOnStart()
       .catch(() => {
@@ -326,7 +315,7 @@ export struct HiNaviEntry {
             title: '重新查看新手引导',
             isCompose: true
           }).onClick(() => {
-            this.showFirstStart = true
+            this.showFirstStart = !this.showFirstStart
           })
           CommonListItem({
             icon: $r('sys.symbol.doc_plaintext_and_pencil'),

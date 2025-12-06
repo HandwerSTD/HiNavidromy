@@ -7,6 +7,7 @@ import { promptAction } from "@kit.ArkUI";
 import { geoLocationManager } from "@kit.LocationKit";
 import preference from '@ohos.data.preferences';
 import GlobalStore from "../../common/statemgmt/GlobalStore";
+import { ServiceInitUtils } from "../../../../../Index";
 
 @ComponentV2
 export struct NavServer {
@@ -17,34 +18,6 @@ export struct NavServer {
     })
   }
 
-  async saveSimulateBg() {
-    const pref = await preference.getPreferences(this.getUIContext().getHostContext()!.getApplicationContext(), appOption.preferenceName)
-    if (true) {
-      PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
-        .then((res) => {
-          if (!res) {
-            promptAction.openToast({
-              message: '请授予权限'
-            })
-            return;
-          }
-          geoLocationManager.on("locationChange", {
-            interval: 10,
-            locationScenario: geoLocationManager.PowerConsumptionScenario.NO_POWER_CONSUMPTION
-          }, () => {})
-          BackgroundTaskManager.startContinuousTask(this.getUIContext().getHostContext()! as common.UIAbilityContext)
-          promptAction.openToast({
-            message: '启动成功'
-          })
-          pref!.put(appOption.simulateBg, true)
-          pref!.flush()
-          AppStorage.set(appOption.simulateBg, true)
-          GlobalStore.simulateBg = true
-        })
-
-    }
-  }
-
   build() {
     ImageTitleWelcomeTemplate({
       customImage: this.icon,
@@ -53,7 +26,7 @@ export struct NavServer {
       useButtonFooter: true,
       buttonFooterText: '后台授权',
       buttonFooterOnClick: () => {
-        this.saveSimulateBg()
+        ServiceInitUtils.startSimulateBg(this.getUIContext().getHostContext() as common.UIAbilityContext, true)
       }
     })
   }

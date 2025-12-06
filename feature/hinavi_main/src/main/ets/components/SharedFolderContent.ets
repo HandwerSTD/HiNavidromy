@@ -366,7 +366,7 @@ export struct SharedFolderContent {
       try {
         await copyFile(srcUri, destPath);
         this.refreshFileList()
-        this.promptAction.openToast({
+        this.promptAction.showToast({
           message: `完成 (${i+1}/${uris.length})`
         })
       } catch (e) {
@@ -378,7 +378,7 @@ export struct SharedFolderContent {
     if (forceMusicFolder) {
       setTimeout(async () => {
         await NavidromeRequestUtil.refreshLibrary()
-        promptAction.openToast({
+        promptAction.showToast({
           message: '已通知 Navidrome 扫描音乐库'
         })
       }, 2000)
@@ -426,7 +426,7 @@ export struct SharedFolderContent {
         action: async () => {
           await this.performDelete('music')
           await this.createFolderToCurrent('music')
-          promptAction.openToast({
+          promptAction.showToast({
             message: '清空音乐库完成'
           })
           // TODO: send request to navidrome for re-scan
@@ -541,13 +541,13 @@ export struct SharedFolderContent {
       } else if (stat.isFile()) {
         await fs.unlink(fullPath)
       }
-      this.promptAction.openToast({
+      this.promptAction.showToast({
         message: '删除成功'
       })
       await this.refreshFileList()
     } catch (e) {
       console.log('error deleting file/folder ' + fullPath, e)
-      this.promptAction.openToast({
+      this.promptAction.showToast({
         message: '删除失败'
       })
     } finally {

@@ -5,8 +5,7 @@
     "deviceTypes": [
       "default",
       "tablet",
-      "2in1",
-      "tv"
+      "2in1"
     ]
   }
 }

@@ -48,13 +48,26 @@ class ServiceInitUtils {
     const bundleInfo =
       await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
     AppStorage.setOrCreate('bundleInfo', bundleInfo)
+
+    // 初始化假进度条
+    GlobalStore.fakeLoadingProgress = 0
+    const totalDuration = VMSwitcher.isTCI ? 70000 : 10000 // TCI: 70秒, 非TCI: 10秒
+    const intervalMs = 100
+    const increment = 100 / (totalDuration / intervalMs)
+    const fakeProgressInterval = setInterval(() => {
+      if (GlobalStore.fakeLoadingProgress < 100) {
+        GlobalStore.fakeLoadingProgress = Math.min(100, GlobalStore.fakeLoadingProgress + increment)
+      } else {
+        clearInterval(fakeProgressInterval)
+      }
+    }, intervalMs)
   }
   async startSimulateBg(context: common.UIAbilityContext, force: boolean = false): Promise<boolean> {
     if (AppStorage.get<boolean>(appOption.simulateBg) || force) {
       return PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
         .then((res) => {
           if (!res) {
-            promptAction.openToast({
+            promptAction.showToast({
               message: '请授予权限'
             })
             return false;
@@ -62,9 +75,13 @@ class ServiceInitUtils {
           geoLocationManager.on("locationChange", {
             interval: 10,
             locationScenario: geoLocationManager.PowerConsumptionScenario.NO_POWER_CONSUMPTION
-          }, () => {})
+          }, () => {
+            promptAction.showToast({
+              message: '位置服务启动成功'
+            })
+          })
           BackgroundTaskManager.startContinuousTask(context as common.UIAbilityContext)
-          promptAction.openToast({
+          promptAction.showToast({
             message: '后台模拟启动成功'
           })
           preference.getPreferences(context, appOption.preferenceName)

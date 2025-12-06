@@ -4,6 +4,7 @@ import { window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import appOption from 'hinavi_main/src/main/ets/model/appOption'
 import { ServiceInitUtils } from 'hinavi_main';
+import { preferences } from '@kit.ArkData';
 
 const DOMAIN = 0x0000;
 
@@ -19,7 +20,12 @@ export default class EntryAbility extends UIAbility {
 
   async onWindowStageCreate(windowStage: window.WindowStage) {
     await ServiceInitUtils.onWindowStageCreate(this.context)
-    windowStage.loadContent('pages/HiNaviEntry', (err) => {
+    const pref = await preferences.getPreferences(this.context.getApplicationContext(), appOption.preferenceName)
+    const firstOpenCompleted = await pref.get(appOption.firstOpenCompleted, false) as boolean
+    let jumpPage = 'pages/HiNaviEntry'
+    if (!firstOpenCompleted) jumpPage = 'pages/FirstOpenPlaceholder'
+
+    windowStage.loadContent(jumpPage, (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;
