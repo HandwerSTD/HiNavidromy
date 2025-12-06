@@ -16,14 +16,14 @@ export struct UsefulTerminalView {
               title: '系统管理',
               isCompose: true
             }) {}
-            CommonListItem({
-              icon: $r('sys.symbol.moon_fill'),
-              title: '关闭系统',
-              subtitle: 'poweroff',
-              isCompose: true
-            }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('poweroff')
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.moon_fill'),
+            //   title: '关闭系统',
+            //   subtitle: 'poweroff',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   VMUtils.suspendAndExecuteCommand('poweroff')
+            // })
             CommonListItem({
               icon: $r('sys.symbol.clock'),
               title: '查看系统时间',
@@ -363,14 +363,14 @@ export struct UsefulTerminalView {
               title: '软件包管理',
               isCompose: true
             }) {}
-            CommonListItem({
-              icon: $r('sys.symbol.loading'),
-              title: '已安装软件包',
-              subtitle: 'apk info',
-              isCompose: true
-            }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('apk info')
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.loading'),
+            //   title: '已安装软件包',
+            //   subtitle: 'apk info',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   VMUtils.suspendAndExecuteCommand('apk info')
+            // })
             CommonListItem({
               icon: $r('sys.symbol.loading'),
               title: '更新软件源',
