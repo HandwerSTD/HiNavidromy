@@ -57,6 +57,7 @@ export struct CommonListItem {
       }
     }
     .hoverEffect(HoverEffect.Highlight)
+    .borderRadius(20)
     .padding({ left: 12, right: 12, bottom: this.trailingOnBottom ? 12 : 8, top: 8 })
     .justifyContent(FlexAlign.Center)
     .constraintSize({
