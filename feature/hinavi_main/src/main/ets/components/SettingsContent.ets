@@ -12,6 +12,7 @@ import { PermissionUtil } from '@pura/harmony-utils';
 import { CommonItemContainer } from './component_library/CommonListItem';
 import GlobalStore from '../common/statemgmt/GlobalStore';
 import { MiscUtils } from '../common/utils/Misc';
+import { LiqD } from '../common/LiqD';
 
 const cpuOptions: number[] = [1, 2, 4, 6, 8, 10, 16, 24, 32]
 const memOptions: number[] = [512, 1024, 2 * 1024, 4 * 1024, 6 * 1024, 8 * 1024, 12 * 1024, 16 * 1024]
@@ -326,13 +327,15 @@ export default struct SettingsContent {
 
   @Builder
   buildAboutMe() {
-    Column() {
+    Column({space: 12}) {
 
-      Image($r('app.media.startIcon'))
-        .width(50)
+      LiqD()
 
-      Text('HiNavidromy')
-        .margin({ top: 10 })
+      Row({space: 24}) {
+        Image($r('app.media.startIcon'))
+          .width(50).borderRadius(12)
+        Text('HiNavidromy\n口袋里的专业音乐管理器')
+      }
 
       Text(`${this.bundleInfo?.versionName}(${this.bundleInfo?.versionCode})`)
         .fontSize(14)
