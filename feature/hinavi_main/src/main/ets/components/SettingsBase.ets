@@ -1,4 +1,4 @@
-import { CommonListItem } from "./component_library/CommonListItem"
+import { CommonListItemV1 } from "./component_library/CommonListItem"
 
 @Component
 export struct BlockTitle {
@@ -34,15 +34,15 @@ export struct ItemTitle {
   }
 }
 
-@ComponentV2
+@Component
 export struct SettingItem {
-  @Param @Require title: string | Resource
-  @Param @Require subTitle: string | Resource
-  @Param icon: Resource | undefined = undefined
+  @Prop title: string | Resource
+  @Prop subTitle: string | Resource
+  @Prop icon: Resource | undefined = undefined
   @BuilderParam content?: () => void
 
   build() {
-    CommonListItem({
+    CommonListItemV1({
       icon: this.icon,
       title: this.title,
       subtitle: this.subTitle,

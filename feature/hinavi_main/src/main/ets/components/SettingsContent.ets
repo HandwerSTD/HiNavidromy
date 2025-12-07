@@ -9,7 +9,7 @@ import { ListFileOptions } from '@kit.CoreFileKit';
 import { BackgroundTaskManager } from '../common/utils/BackgroundTaskManager';
 import { geoLocationManager } from '@kit.LocationKit';
 import { PermissionUtil } from '@pura/harmony-utils';
-import { CommonItemContainer } from './component_library/CommonListItem';
+import { CommonItemContainerV1 } from './component_library/CommonListItem';
 import GlobalStore from '../common/statemgmt/GlobalStore';
 import { MiscUtils } from '../common/utils/Misc';
 import { LiqD } from '../common/LiqD';
@@ -223,7 +223,7 @@ export default struct SettingsContent {
         Column({space: 12}) {
 
           BlockTitle({ content: $r("app.string.setting_block_system") })
-          CommonItemContainer() {
+          CommonItemContainerV1() {
             SettingItem({
               title: $r('app.string.setting_cpu'),
               subTitle: $r('app.string.setting_cpu_desc'),
@@ -250,7 +250,7 @@ export default struct SettingsContent {
           }
 
           BlockTitle({ content: $r("app.string.setting_block_display") })
-          CommonItemContainer() {
+          CommonItemContainerV1() {
             SettingItem({
               title: $r('app.string.setting_keep_screen_on'),
               subTitle: $r('app.string.setting_keep_screen_on_desc'),
@@ -284,7 +284,7 @@ export default struct SettingsContent {
           }
 
           BlockTitle({ content: $r('app.string.setting_block_about') })
-          CommonItemContainer() {
+          CommonItemContainerV1() {
             LinkItem({
               icon: $r('sys.symbol.house'),
               title: $r('app.string.code_repository'),
@@ -329,9 +329,9 @@ export default struct SettingsContent {
   buildAboutMe() {
     Column({space: 12}) {
 
-      // LiqD()
+      LiqD()
 
-      Row({space: 24}) {
+      Row({space: 12}) {
         Image($r('app.media.startIcon'))
           .width(50).borderRadius(12)
         Text('HiNavidromy\n口袋里的专业音乐管理器')
@@ -368,19 +368,6 @@ export default struct SettingsContent {
         }
       ],
     });
-  }
-
-  private async toWebBrowser(url: string): Promise<void> {
-    let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
-    let want: Want = {
-      action: 'ohos.want.action.viewData',
-      entities: ['entity.system.browsable'],
-      uri: url,
-      parameters: {
-        bundleName: context.abilityInfo.bundleName
-      }
-    };
-    await context.startAbility(want);
   }
 
   private async markResetLinuxAndRestart() {

@@ -88,3 +88,90 @@ export struct CommonItemContainer {
     .borderRadius(20)
   }
 }
+@Component
+export struct CommonItemContainerV1 {
+  @Prop spc: number = 0
+  @BuilderParam child: () => void
+
+  build() {
+    Column({space: this.spc}) {
+      this.child()
+    }.backgroundColor($r('sys.color.ohos_fa_list_card_bg'))
+    .borderRadius(20)
+  }
+}
+
+@Component
+export struct CommonListItemV1 {
+  @Prop icon: Resource | null = null
+  @Prop isSymbol: boolean = true
+  @Prop title: ResourceStr = ''
+  @Prop subtitle: ResourceStr | null = null
+  @Prop filled: boolean = true
+  @Prop trailingOnBottom: boolean = false
+  @Prop highlightBorder: boolean = false
+  @Prop isCompose: boolean = false
+
+  @Prop fontColor: ResourceColor = $r('sys.color.font')
+  @Prop titleModifier: TextModifier | undefined = undefined
+  @Prop hintFontColor: ResourceColor = $r('sys.color.font_on_secondary')
+  @BuilderParam trailing?: () => void
+
+  @Builder Build() {
+    Column() {
+      Row() {
+        if (this.icon) {
+          if (this.isSymbol) {
+            SymbolGlyph(this.icon)
+              .fontSize(24)
+              .margin({ right: 12 })
+              .fontColor([this.fontColor])
+          } else {
+            Image(this.icon)
+              .width(24.29)
+              .margin({ right: 12 })
+              .draggable(false)
+          }
+        }
+        Column() {
+          Text(this.title)
+            .attributeModifier(this.titleModifier)
+            .fontColor(this.fontColor)
+          if (this.subtitle) {
+            Text(this.subtitle)
+              .fontSize(12)
+              .fontColor(this.hintFontColor)
+          }
+        }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+        if (this.trailing && !this.trailingOnBottom) {
+          this.trailing()
+        } else {
+          SymbolGlyph($r('sys.symbol.chevron_right'))
+            .fontSize(24)
+            .fontColor([this.fontColor])
+        }
+      }
+      .justifyContent(FlexAlign.Start)
+      if (this.trailing && this.trailingOnBottom) {
+        this.trailing()
+      }
+    }
+    .hoverEffect(HoverEffect.Highlight)
+    .borderRadius(20)
+    .padding({ left: 12, right: 12, bottom: this.trailingOnBottom ? 12 : 8, top: 8 })
+    .justifyContent(FlexAlign.Center)
+    .constraintSize({
+      minHeight: 54
+    })
+  }
+  build() {
+    if (this.isCompose) {
+      this.Build()
+    } else {
+      Column() {
+        this.Build()
+      }.backgroundColor($r('sys.color.ohos_fa_list_card_bg'))
+      .borderRadius(20)
+    }
+  }
+}
