@@ -51,6 +51,11 @@ export struct SharedFolderContent {
       content: '正在备份音乐库...',
     }),
   })
+  importMusicProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '正在导入音乐库...',
+    }),
+  })
   createFolderController = new CustomDialogController({
     builder: CustomContentDialog({
       primaryTitle: $r('app.string.create_folder'),
@@ -286,6 +291,11 @@ export struct SharedFolderContent {
             action: () => {
               this.backupMusicLibrary()
             }
+          }, {
+            value: '导入音乐库 (ZIP)',
+            action: () => {
+              this.importMusicLibrary()
+            }
           }])
       }
       .height(56)
@@ -509,6 +519,91 @@ export struct SharedFolderContent {
       });
     } finally {
       this.backupProgress.close();
+    }
+  }
+
+  private async importMusicLibrary() {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+
+    // 选择 ZIP 文件
+    const options = new picker.DocumentSelectOptions();
+    options.maxSelectNumber = 1;
+
+    const documentPicker = new picker.DocumentViewPicker(context);
+    let uris: string[];
+    try {
+      uris = await documentPicker.select(options);
+    } catch (e) {
+      console.log('error selecting file', e);
+      return;
+    }
+
+    if (uris.length === 0) {
+      return;
+    }
+
+    const srcUri = uris[0];
+    const fileName = decodeURI(srcUri.split('/').reverse()[0]);
+
+    // 检查是否为 ZIP 文件
+    if (!fileName.toLowerCase().endsWith('.zip')) {
+      this.promptAction.showToast({
+        message: '请选择 ZIP 文件',
+        duration: 3000
+      });
+      return;
+    }
+
+    this.importMusicProgress.open();
+    try {
+      // 生成时间戳文件夹名
+      const timestamp = new Date();
+      const dateStr = `${timestamp.getFullYear()}${String(timestamp.getMonth() + 1).padStart(2, '0')}${String(timestamp.getDate()).padStart(2, '0')}_${String(timestamp.getHours()).padStart(2, '0')}${String(timestamp.getMinutes()).padStart(2, '0')}${String(timestamp.getSeconds()).padStart(2, '0')}`;
+
+      // 创建目标文件夹 /mnt/share/music/yyyyMMdd_HHmmss/
+      const destFolderPath = [this.host, 'music', dateStr].join('/');
+      fs.mkdirSync(destFolderPath);
+
+      // 复制 ZIP 文件到临时目录
+      const tempZipPath = context.tempDir + '/' + fileName;
+      await copyFile(srcUri, tempZipPath);
+
+      // 解压 ZIP 文件到目标文件夹
+      await zlib.decompressFile(tempZipPath, destFolderPath);
+
+      // 删除临时 ZIP 文件
+      try {
+        await fs.unlink(tempZipPath);
+      } catch (e) {
+        console.log('error deleting temp zip file', e);
+      }
+
+      // 修改权限
+      VMUtils.suspendAndExecuteCommand('chmod -R o+rwx /mnt/share', false);
+
+      this.promptAction.showToast({
+        message: '音乐库导入成功',
+        duration: 3000
+      });
+
+      // 刷新文件列表
+      await this.refreshFileList();
+
+      // 通知 Navidrome 扫描
+      setTimeout(async () => {
+        await NavidromeRequestUtil.refreshLibrary();
+        promptAction.showToast({
+          message: '已通知 Navidrome 扫描音乐库'
+        });
+      }, 2000);
+    } catch (e) {
+      console.log('error importing music library', e);
+      this.promptAction.showToast({
+        message: '导入失败: ' + (e as BusinessError).message,
+        duration: 3000
+      });
+    } finally {
+      this.importMusicProgress.close();
     }
   }
 
