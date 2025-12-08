@@ -145,30 +145,11 @@ const controller: WebTerminalController = new WebTerminalController();
 export default struct WebTerminal {
   showVirtKey: boolean = true;
   @State ctrlPressed: boolean = false;
-  private repeatTimer: number = -1;
 
   aboutToAppear(): void {
     controller.setOnCtrlChangedCallback((pressed) => {
       this.ctrlPressed = pressed;
     });
-  }
-
-  aboutToDisappear(): void {
-    this.stopRepeat();
-  }
-
-  private startRepeat(input: string) {
-    controller.sendInput(input);
-    this.repeatTimer = setInterval(() => {
-      controller.sendInput(input);
-    }, 500);
-  }
-
-  private stopRepeat() {
-    if (this.repeatTimer !== -1) {
-      clearInterval(this.repeatTimer);
-      this.repeatTimer = -1;
-    }
   }
 
   @Builder
@@ -242,13 +223,12 @@ export default struct WebTerminal {
           .onClick(() => {
             controller.sendInput('\x1b[A');
           })
-          .onTouch((event: TouchEvent) => {
-            if (event.type === TouchType.Down) {
-              this.startRepeat('\x1b[A');
-            } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-              this.stopRepeat();
-            }
-          })
+          .gesture(
+            LongPressGesture({ repeat: true })
+              .onAction(() => {
+                controller.sendInput('\x1b[A');
+              })
+          )
         Button('↓')
           .height(VKeyHeight)
           .margin({ right: VKeyMargin })
@@ -256,13 +236,12 @@ export default struct WebTerminal {
           .onClick(() => {
             controller.sendInput('\x1b[B');
           })
-          .onTouch((event: TouchEvent) => {
-            if (event.type === TouchType.Down) {
-              this.startRepeat('\x1b[B');
-            } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-              this.stopRepeat();
-            }
-          })
+          .gesture(
+            LongPressGesture({ repeat: true })
+              .onAction(() => {
+                controller.sendInput('\x1b[B');
+              })
+          )
         Button('←')
           .height(VKeyHeight)
           .margin({ right: VKeyMargin })
@@ -270,13 +249,12 @@ export default struct WebTerminal {
           .onClick(() => {
             controller.sendInput('\x1b[D');
           })
-          .onTouch((event: TouchEvent) => {
-            if (event.type === TouchType.Down) {
-              this.startRepeat('\x1b[D');
-            } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-              this.stopRepeat();
-            }
-          })
+          .gesture(
+            LongPressGesture({ repeat: true })
+              .onAction(() => {
+                controller.sendInput('\x1b[D');
+              })
+          )
         Button('→')
           .height(VKeyHeight)
           .margin({ right: VKeyMargin })
@@ -284,13 +262,12 @@ export default struct WebTerminal {
           .onClick(() => {
             controller.sendInput('\x1b[C');
           })
-          .onTouch((event: TouchEvent) => {
-            if (event.type === TouchType.Down) {
-              this.startRepeat('\x1b[C');
-            } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-              this.stopRepeat();
-            }
-          })
+          .gesture(
+            LongPressGesture({ repeat: true })
+              .onAction(() => {
+                controller.sendInput('\x1b[C');
+              })
+          )
       }
       .margin({ left: 5, right: 5 })
       Row() {
