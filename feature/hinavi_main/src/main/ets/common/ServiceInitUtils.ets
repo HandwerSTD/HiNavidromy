@@ -63,8 +63,9 @@ class ServiceInitUtils {
     }, intervalMs)
   }
   async startSimulateBg(context: common.UIAbilityContext, force: boolean = false): Promise<boolean> {
-    if (AppStorage.get<boolean>(appOption.simulateBg) || force) {
-      return PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
+    const shouldSimulate = AppStorage.get<boolean>(appOption.simulateBg) ?? false
+    if (shouldSimulate || force) {
+      return await PermissionUtil.requestPermissionsEasy("ohos.permission.APPROXIMATELY_LOCATION")
         .then((res) => {
           if (!res) {
             promptAction.showToast({
@@ -76,9 +77,6 @@ class ServiceInitUtils {
             interval: 10,
             locationScenario: geoLocationManager.PowerConsumptionScenario.NO_POWER_CONSUMPTION
           }, () => {
-            promptAction.showToast({
-              message: '位置服务启动成功'
-            })
           })
           BackgroundTaskManager.startContinuousTask(context as common.UIAbilityContext)
           promptAction.showToast({

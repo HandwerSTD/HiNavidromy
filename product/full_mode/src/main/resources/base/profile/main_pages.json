@@ -1,6 +1,7 @@
 {
   "src": [
     "pages/HiNaviEntry",
-    "pages/FirstOpenPlaceholder"
+    "pages/FirstOpenPlaceholder",
+    "pages/RecoveryPage"
   ]
 }

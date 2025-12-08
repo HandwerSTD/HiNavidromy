@@ -1,0 +1,18 @@
+{
+  "shortcuts": [
+    {
+      "shortcutId": "recovery_mode",
+      "label": "$string:shortcut_recovery",
+      "icon": "$media:ic_recovery",
+      "wants": [
+        {
+          "bundleName": "top.handwer.hish.hinavidromy",
+          "abilityName": "EntryAbility",
+          "parameters": {
+            "recovery": "true"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -227,6 +227,10 @@
     {
       "name": "import_file_to_music",
       "value": "导入到音乐库"
+    },
+    {
+      "name": "shortcut_recovery",
+      "value": "系统恢复"
     }
   ]
 }

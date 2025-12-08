@@ -47,6 +47,12 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
+        "metadata": [
+          {
+            "name": "ohos.ability.shortcuts",
+            "resource": "$profile:shortcuts_config"
+          }
+        ],
         "skills": [
           {
             "entities": [
@@ -59,8 +65,8 @@
         ],
         "backgroundModes": [
           "location"
-        ]
+        ],
       }
-    ]
+    ],
   }
 }
