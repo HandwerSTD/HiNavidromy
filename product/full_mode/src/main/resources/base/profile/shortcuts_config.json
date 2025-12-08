@@ -3,7 +3,7 @@
     {
       "shortcutId": "recovery_mode",
       "label": "$string:shortcut_recovery",
-      "icon": "$media:ic_recovery",
+      "icon": "$media:ic_shortcut_radio",
       "wants": [
         {
           "bundleName": "top.handwer.hish.hinavidromy",
