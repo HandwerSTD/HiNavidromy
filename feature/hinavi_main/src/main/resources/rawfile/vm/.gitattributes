@@ -1,0 +1,2 @@
+rootfs_aarch64.qcow2 filter=lfs diff=lfs merge=lfs -text
+kernel_aarch64 filter=lfs diff=lfs merge=lfs -text
