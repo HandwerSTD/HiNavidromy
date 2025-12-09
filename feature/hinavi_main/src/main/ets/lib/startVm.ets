@@ -53,10 +53,11 @@ function startVm(options: VmOptions) {
       "TERM=ansi init=" + '/init']
 
   const guestAgent = [
-    "-chardev", "socket,path=" + options.guestAgentSocket + ",server=on,wait=off,id=qga0",
-    "-device", "virtio-serial-pci",
-    "-device", "virtserialport,chardev=qga0,name=org.qemu.guest_agent.0"
+    '-device', 'virtio-serial-pci-non-transitional,id=virtio-serial0',
+    '-chardev', 'socket,path=' + options.guestAgentSocket + ',server=on,wait=off,id=qga0',
+    '-device', 'virtserialport,chardev=qga0,bus=virtio-serial0.0,name=org.qemu.guest_agent.0'
   ]
+
 
   const args: string[] = [
     'qemu-system-aarch64',
