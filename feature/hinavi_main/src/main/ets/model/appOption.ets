@@ -19,6 +19,7 @@ class appOption {
   static developerMode = 'developerMode'
   static guestAgentSocket = 'guestAgentSocket'
   static systemVersion = 'systemVersion'
+  static ignoredUpdateVersions = 'ignoredUpdateVersions'
 }
 
 interface PortMapping {

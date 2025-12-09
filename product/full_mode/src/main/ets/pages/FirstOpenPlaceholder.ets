@@ -1,6 +1,6 @@
-import { ImageTitleWelcomeTemplate } from 'hinavi_main'
+import { ImageTitleWelcomeTemplate, SystemImageUtils } from 'hinavi_main'
 import { privacyManager } from '@kit.AppGalleryKit'
-import { common } from '@kit.AbilityKit'
+import { application, common } from '@kit.AbilityKit'
 import { WantUtil } from '@pura/harmony-utils'
 
 
@@ -11,6 +11,7 @@ struct FinalWelcome {
   @Local useCustomPrivacy: boolean = false
 
   onGo() {
+    SystemImageUtils.updateToCurrentVersion(application.getApplicationContext())
     this.getUIContext().getRouter().replaceUrl({
       url: 'pages/HiNaviEntry'
     })

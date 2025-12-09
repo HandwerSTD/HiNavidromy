@@ -3,7 +3,7 @@ import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
 import { window, KeyboardAvoidMode, promptAction } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import appOption from 'hinavi_main/src/main/ets/model/appOption'
-import { ServiceInitUtils } from 'hinavi_main';
+import { ServiceInitUtils, SystemImageUtils } from 'hinavi_main';
 import { preferences } from '@kit.ArkData';
 import { DialogHelper } from '@pura/harmony-dialog';
 
@@ -82,10 +82,16 @@ export default class EntryAbility extends UIAbility {
     }
     await ServiceInitUtils.onWindowStageCreate(this.context)
     const pref = await preferences.getPreferences(this.context.getApplicationContext(), appOption.preferenceName)
-    const firstOpenCompleted = await pref.get(appOption.firstOpenCompleted, false) as boolean
-    let jumpPage = 'pages/HiNaviEntry'
-    if (!firstOpenCompleted) jumpPage = 'pages/FirstOpenPlaceholder'
 
+    let jumpPage = 'pages/HiNaviEntry'
+    // update
+    if (await SystemImageUtils.checkHasUpdate(this.context.getApplicationContext())) {
+      jumpPage = 'pages/UpgradePage'
+    }
+    // first open
+    const firstOpenCompleted = await pref.get(appOption.firstOpenCompleted, false) as boolean
+    if (!firstOpenCompleted) jumpPage = 'pages/FirstOpenPlaceholder'
+    // load
     windowStage.loadContent(jumpPage, (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));

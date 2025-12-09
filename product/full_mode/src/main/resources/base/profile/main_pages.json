@@ -2,6 +2,7 @@
   "src": [
     "pages/HiNaviEntry",
     "pages/FirstOpenPlaceholder",
-    "pages/RecoveryPage"
+    "pages/RecoveryPage",
+    "pages/UpgradePage"
   ]
 }
