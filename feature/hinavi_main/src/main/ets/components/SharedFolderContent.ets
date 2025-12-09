@@ -7,7 +7,7 @@ import { pasteboard } from '@kit.BasicServicesKit'
 import validateFolderName from '../lib/validateFolderName'
 import { util } from "@kit.ArkTS";
 import appOption from '../model/appOption';
-import { VMUtils } from '../common/utils/NavidromeServerUtils';
+import { NavidromeServerUtils, VMUtils } from '../common/utils/NavidromeServerUtils';
 import { NavidromeRequestUtil } from '../common/utils/NavidromeRequest';
 
 enum Type {
@@ -54,6 +54,11 @@ export struct SharedFolderContent {
   importMusicProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
       content: '正在导入音乐库...',
+    }),
+  })
+  restoreDbProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '正在恢复数据库...',
     }),
   })
   createFolderController = new CustomDialogController({
@@ -144,19 +149,7 @@ export struct SharedFolderContent {
                 .fontColor([$r('sys.color.icon_secondary')])
                 .margin({ right: 8 })
                 .clickEffect({ level: ClickEffectLevel.LIGHT, scale: 0.8 })
-                .bindMenu([{
-                  value: $r('app.string.open_file'),
-                  action: () => this.openFile(item.name)
-                }, {
-                  value: $r('app.string.export_file_from_shared_folder'),
-                  action: () => this.saveFile(item.name)
-                }, {
-                  value: $r('app.string.copy_guest_path'),
-                  action: () => this.copyGuestPath(item.name)
-                }, {
-                  value: '删除文件',
-                  action: () => this.deleteFileOrFolder(item.name, Type.File)
-                }])
+                .bindMenu(this.getFileMenuItems(item))
             } else if (item.type == Type.Folder) {
               SymbolGlyph($r('sys.symbol.dot_grid_1x2'))
                 .fontSize(24)
@@ -528,6 +521,7 @@ export struct SharedFolderContent {
     // 选择 ZIP 文件
     const options = new picker.DocumentSelectOptions();
     options.maxSelectNumber = 1;
+    options.fileSuffixFilters = ['zip']
 
     const documentPicker = new picker.DocumentViewPicker(context);
     let uris: string[];
@@ -679,6 +673,69 @@ export struct SharedFolderContent {
       })
       .sort((a, b) => comparator(a, b));
     this.scroller.scrollTo({ yOffset: 0, xOffset: 0 })
+  }
+
+  private getFileMenuItems(item: Entry): MenuElement[] {
+    const menuItems: MenuElement[] = [{
+      value: $r('app.string.open_file'),
+      action: () => this.openFile(item.name)
+    }, {
+      value: $r('app.string.export_file_from_shared_folder'),
+      action: () => this.saveFile(item.name)
+    }, {
+      value: $r('app.string.copy_guest_path'),
+      action: () => this.copyGuestPath(item.name)
+    }, {
+      value: '删除文件',
+      action: () => this.deleteFileOrFolder(item.name, Type.File)
+    }]
+
+    // 如果是 .db 文件，添加恢复数据库选项
+    if (item.name.toLowerCase().endsWith('.db')) {
+      menuItems.push({
+        value: '恢复 Navidrome 数据库',
+        action: () => this.confirmRestoreDb(item.name)
+      })
+    }
+
+    return menuItems
+  }
+
+  private confirmRestoreDb(name: string) {
+    const guestPath = [this.guest, ...this.current.slice(1), name].join('/')
+    this.getUIContext().showAlertDialog({
+      title: '恢复数据库',
+      message: `确认要使用 "${name}" 恢复 Navidrome 数据库吗？\n此操作将：\n1. 停止 Navidrome 服务\n2. 备份当前数据库\n3. 用选中的文件替换数据库\n4. 重启 Navidrome 服务`,
+      primaryButton: {
+        value: '取消',
+        action: () => {}
+      },
+      secondaryButton: {
+        value: '确认恢复',
+        fontColor: $r('sys.color.warning'),
+        action: () => {
+          this.restoreNavidromeDb(guestPath)
+        }
+      }
+    })
+  }
+
+  private async restoreNavidromeDb(dbPath: string) {
+    this.restoreDbProgress.open()
+    try {
+      await NavidromeServerUtils.recoverBackup(dbPath)
+      this.promptAction.showToast({
+        message: '数据库恢复成功',
+        duration: 3000
+      })
+    } catch (e) {
+      this.promptAction.showToast({
+        message: `恢复失败: ${(e as Error).message}`,
+        duration: 3000
+      })
+    } finally {
+      this.restoreDbProgress.close()
+    }
   }
 }
 

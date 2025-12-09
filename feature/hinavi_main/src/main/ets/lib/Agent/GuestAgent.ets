@@ -491,8 +491,8 @@ export class GuestAgentHelper {
         return { output: '', exitCode: -1, success: false }
       }
 
-      // 等待命令执行完成并获取结果
-      for (let i = 0; i < 20; i++) {
+      // 等待命令执行完成并获取结果，最长等待 200s
+      for (let i = 0; i < 2000; i++) {
         await new Promise<void>((resolve: () => void) => setTimeout(resolve, 100))
         const status: ESObject | null = await agent.execStatus(pid)
 
