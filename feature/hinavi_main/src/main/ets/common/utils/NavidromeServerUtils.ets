@@ -3,6 +3,7 @@ import { RetryUtil } from "./CommonUtil";
 import { http } from "@kit.NetworkKit";
 import { buffer } from "@kit.ArkTS";
 import { VMSwitcher } from "../../lib/VMSwitcher";
+import QemuAgentManager from "../../lib/Agent/AgentManager";
 
 export enum ServerLoadStatus {
   LOADING,
@@ -21,6 +22,10 @@ export class NavidromeServerUtils {
         .then((val) => {
           if (val.responseCode === 200) {
             GlobalStore.serverStatus = ServerLoadStatus.SUCCESS
+            QemuAgentManager.acquire()
+              .then((res) => {
+
+              })
           }
         })
     }, () => {

@@ -129,6 +129,9 @@ class ServiceInitUtils {
       cpuCount, memSize, portMapping)
 
     const serialUnixSocket = appContext.tempDir + '/serial_socket'
+    const guestAgentSocket = appContext.tempDir + '/qga_socket'
+
+    AppStorage.setOrCreate(appOption.guestAgentSocket, guestAgentSocket)
 
     startVm({
       baseDir: vmBaseDir,
@@ -138,7 +141,8 @@ class ServiceInitUtils {
       kernel: kernelFile,
       rootFilesystem,
       sharedFolder,
-      serialUnixSocket
+      serialUnixSocket,
+      guestAgentSocket
     })
   }
 

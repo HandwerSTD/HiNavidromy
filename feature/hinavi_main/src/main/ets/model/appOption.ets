@@ -17,6 +17,8 @@ class appOption {
   static simulateBg = 'simulateBg'
   static firstOpenCompleted = 'firstOpenCompleted'
   static developerMode = 'developerMode'
+  static guestAgentSocket = 'guestAgentSocket'
+  static systemVersion = 'systemVersion'
 }
 
 interface PortMapping {
