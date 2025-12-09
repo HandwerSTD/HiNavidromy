@@ -12,6 +12,7 @@ import { geoLocationManager } from "@kit.LocationKit";
 import { BackgroundTaskManager } from "./utils/BackgroundTaskManager";
 import GlobalStore from "./statemgmt/GlobalStore";
 import { DEBUG } from '../../../../BuildProfile'
+import { NavidromeServerUtils } from "./utils/NavidromeServerUtils";
 
 const DOMAIN = 0x0000;
 

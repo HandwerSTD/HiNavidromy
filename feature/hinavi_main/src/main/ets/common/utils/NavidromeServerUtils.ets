@@ -6,6 +6,8 @@ import { VMSwitcher } from "../../lib/VMSwitcher";
 import QemuAgentManager from "../../lib/Agent/AgentManager";
 import { GuestAgentHelper } from "../../lib/Agent/GuestAgent";
 import { promptAction } from "@kit.ArkUI";
+import { GlobalContext } from "@pura/harmony-utils";
+import { DialogHelper } from "@pura/harmony-dialog";
 
 export enum ServerLoadStatus {
   LOADING,
@@ -13,8 +15,12 @@ export enum ServerLoadStatus {
   TIMEOUT
 }
 
+let isAlreadyStart: boolean = false
+
 export class NavidromeServerUtils {
-  static checkConnectionOnStart() {
+  static async checkConnectionOnStart() {
+    if (isAlreadyStart) return
+    isAlreadyStart = true
     const timeout = VMSwitcher.isTCI ? 40 : 30
     // 60s 登录时间
     return RetryUtil.retryIf<void>(timeout, async () => {
@@ -26,23 +32,46 @@ export class NavidromeServerUtils {
             GlobalStore.serverStatus = ServerLoadStatus.SUCCESS
             QemuAgentManager.acquire()
               .then(() => {
-                NavidromeServerUtils.autoBackupLibraryDB()
-                  .then(() => {
-                    promptAction.showToast({
-                      message: '已自动备份数据库'
-                    })
-                  })
-                  .catch((err: BusinessError<void>) => {
-                    promptAction.showToast({
-                      message: '自动备份数据库失败: ' + err.message
-                    })
-                  })
+                NavidromeServerUtils.afterAgentConnection()
               })
           }
         })
     }, () => {
       return !GlobalStore.isServerOnline
     }, 2000)
+  }
+  private static async afterAgentConnection() {
+    if (GlobalContext.getContext().getObject('upgradeMode')) {
+      // 更新，恢复数据库
+      const id = DialogHelper.showLoadingDialog()
+      await NavidromeServerUtils.recoverBackup('/mnt/share/hinavi_recent_backup.db')
+        .then(() => {
+          promptAction.showToast({
+            message: '升级数据恢复完成'
+          })
+        })
+        .catch(() => {
+          promptAction.showToast({
+            message: '数据库恢复失败'
+          })
+        })
+        .finally(() => {
+          DialogHelper.closeDialog(id)
+        })
+    } else if (GlobalStore.isFirstOpenFinished) {
+      // 非更新，备份一遍数据库
+      await NavidromeServerUtils.autoBackupLibraryDB()
+        .then(() => {
+          promptAction.showToast({
+            message: '已自动备份数据库'
+          })
+        })
+        .catch((err: BusinessError<void>) => {
+          promptAction.showToast({
+            message: '自动备份数据库失败: ' + err.message
+          })
+        })
+    }
   }
   static async backupLibraryDB(): Promise<string> {
     // 生成时间戳格式：yyyyMMdd_HHmmss
@@ -68,12 +97,13 @@ export class NavidromeServerUtils {
     const backupPath = `/mnt/share/${backupFileName}`
 
     // 执行备份命令
-    const cmd = `rm ${backupPath} && sqlite3 /var/lib/navidrome/navidrome.db ".backup ${backupPath}"`
+    const cmd = `rm -f ${backupPath} && sqlite3 /var/lib/navidrome/navidrome.db ".backup ${backupPath}"`
     const result = await GuestAgentHelper.execWithExitCode('/root', cmd)
 
     if (!result.success) {
       throw new Error(`备份失败，返回码: ${result.exitCode}, 输出: ${result.output}`)
     }
+    GlobalStore.todayBackupFinished = true
 
     return backupPath
   }

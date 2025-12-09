@@ -19,6 +19,7 @@ class MyPageStack extends NavPathStack {
 class GlobalStore {
 
   private static _instance?: GlobalStore
+  todayBackupFinished: boolean = false
 
   static get instance() {
     if (!GlobalStore._instance) {
@@ -49,9 +50,7 @@ class GlobalStore {
 
   @Trace initialized: boolean = false
 
-  @Trace isAgentSupported: boolean = true
-
-  @Trace isFirstOpenFinished: boolean = true
+  @Trace isFirstOpenFinished: boolean = false
 
   @Trace serverStatus: ServerLoadStatus = ServerLoadStatus.LOADING
   @Trace showTerminal: boolean = false

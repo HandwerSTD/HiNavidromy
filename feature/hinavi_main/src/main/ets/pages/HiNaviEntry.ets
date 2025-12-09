@@ -44,6 +44,7 @@ export struct HiNaviEntry {
     this.preferences = await preference.getPreferences(this.context.getApplicationContext(), appOption.preferenceName)
     const firstOpenCompleted = await this.preferences.get(appOption.firstOpenCompleted, false) as boolean
     this.showFirstStart = !firstOpenCompleted
+    GlobalStore.isFirstOpenFinished = firstOpenCompleted
 
     NavidromeServerUtils.checkConnectionOnStart()
       .catch(() => {
@@ -346,6 +347,7 @@ export struct HiNaviEntry {
         await this.preferences?.put(appOption.firstOpenCompleted, true)
         await this.preferences?.flush()
         this.showFirstStart = false
+        GlobalStore.isFirstOpenFinished = true
       }
     })
   }

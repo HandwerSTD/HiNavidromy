@@ -1,8 +1,12 @@
-import { ImageTitleWelcomeTemplate, SymbolTitle, SystemImageUtils } from 'hinavi_main'
-import { router } from '@kit.ArkUI';
+import { GlobalStore, ImageTitleWelcomeTemplate, SymbolTitle, SystemImageUtils } from 'hinavi_main'
+import { promptAction, router } from '@kit.ArkUI';
 import appOption from 'hinavi_main/src/main/ets/model/appOption';
 import { preferences } from '@kit.ArkData';
-import { Want } from '@kit.AbilityKit';
+import { application, common, Want } from '@kit.AbilityKit';
+import { NavidromeServerUtils, ServerLoadStatus } from 'hinavi_main/src/main/ets/common/utils/NavidromeServerUtils';
+import WebTerminal from 'hinavi_main/src/main/ets/components/WebTerminal';
+import { RetryUtil } from 'hinavi_main/src/main/ets/common/utils/CommonUtil';
+import { DialogHelper } from '@pura/harmony-dialog';
 
 @Entry
 @ComponentV2
@@ -12,6 +16,8 @@ struct UpgradePage {
 
   aboutToAppear(): void {
     this.checkForceUpdate()
+    GlobalStore.isFirstOpenFinished = true
+    NavidromeServerUtils.checkConnectionOnStart()
   }
 
   private async checkForceUpdate() {
@@ -27,48 +33,75 @@ struct UpgradePage {
   }
 
   @Builder Footer() {
-    Column({ space: 12 }) {
-      if (!this.isForce) {
-        Button('跳过更新')
+    if (GlobalStore.serverStatus !== ServerLoadStatus.LOADING) {
+      Column({ space: 12 }) {
+        if (!this.isForce) {
+          Button('跳过更新')
+            .onClick(() => {
+              this.onSkipClick()
+            })
+            .width('100%')
+            .constraintSize({
+              maxWidth: 640
+            })
+            .buttonStyle(ButtonStyleMode.NORMAL)
+        }
+
+        Button('立即更新')
           .onClick(() => {
-            this.onSkipClick()
+            this.onUpgradeClick()
           })
           .width('100%')
           .constraintSize({
             maxWidth: 640
           })
-          .buttonStyle(ButtonStyleMode.NORMAL)
       }
-
-      Button('立即更新')
-        .onClick(() => {
-          this.onUpgradeClick()
-        })
-        .width('100%')
-        .constraintSize({
-          maxWidth: 640
-        })
+      .width('100%')
+      .alignItems(HorizontalAlign.Center)
+    } else {
+      LoadingProgress().height(40)
     }
-    .width('100%')
-    .alignItems(HorizontalAlign.Center)
   }
 
   private async onUpgradeClick() {
-    const context = this.getUIContext().getHostContext()!.getApplicationContext()
-    const pref = await preferences.getPreferences(context, appOption.preferenceName)
-    // 标记重置 Linux
-    await pref.put(appOption.resetLinuxFlag, true)
-    // 更新系统版本号
-    await SystemImageUtils.updateToCurrentVersionByPref(pref)
-    await pref.flush()
-    this.restartApp()
+    const id = DialogHelper.showLoadingDialog({
+      content: '请等待数据库备份完成'
+    })
+    RetryUtil.retryIf(30, async () => {
+      if (!GlobalStore.todayBackupFinished) throw Error()
+    }, () => { return !GlobalStore.todayBackupFinished})
+      .then(async () => {
+        const context = this.getUIContext().getHostContext()!.getApplicationContext()
+        const pref = await preferences.getPreferences(context, appOption.preferenceName)
+        // 标记重置 Linux
+        await pref.put(appOption.resetLinuxFlag, true)
+        // 更新系统版本号
+        await SystemImageUtils.updateToCurrentVersionByPref(pref)
+        await pref.flush()
+        this.restartApp()
+      })
+      .catch(() => {
+        DialogHelper.closeDialog(id)
+        this.getUIContext().showAlertDialog({
+          message: '等待数据库备份失败，请点击退出程序，等待一分钟后再打开应用尝试',
+          primaryButton: {
+            value: '退出程序',
+            action: () => {
+              (this.getUIContext().getHostContext()! as common.UIAbilityContext).terminateSelf()
+            }
+          }
+        })
+      })
   }
 
   private restartApp() {
     const applicationContext = this.getUIContext().getHostContext()!.getApplicationContext()
     const want: Want = {
       bundleName: 'top.handwer.hish.hinavidromy',
-      abilityName: 'EntryAbility'
+      abilityName: 'EntryAbility',
+      parameters: {
+        "upgrade": true
+      }
     }
     applicationContext.restartApp(want)
   }
@@ -76,7 +109,9 @@ struct UpgradePage {
   private async onSkipClick() {
     const context = this.getUIContext().getHostContext()!.getApplicationContext()
     await SystemImageUtils.ignoreCurrentVersionUpdate(context)
-    router.back()
+    this.getUIContext().getRouter().replaceUrl({
+      url: 'pages/HiNaviEntry'
+    })
   }
 
   private getSubtitle(): string {
@@ -97,6 +132,7 @@ struct UpgradePage {
         subtitle: this.getSubtitle(),
         footer: () => { this.Footer() }
       })
+      WebTerminal().height(1).opacity(0)
     }
     .height('100%')
     .width('100%')

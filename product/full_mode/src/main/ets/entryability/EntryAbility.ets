@@ -6,6 +6,7 @@ import appOption from 'hinavi_main/src/main/ets/model/appOption'
 import { ServiceInitUtils, SystemImageUtils } from 'hinavi_main';
 import { preferences } from '@kit.ArkData';
 import { DialogHelper } from '@pura/harmony-dialog';
+import { GlobalContext } from '@pura/harmony-utils';
 
 const DOMAIN = 0x0000;
 
@@ -49,6 +50,9 @@ export default class EntryAbility extends UIAbility {
     if (want.parameters) {
       if (want.parameters['recovery']) {
         this.isShouldInRecoveryMode = true
+      }
+      if (want.parameters['upgrade']) {
+        GlobalContext.getContext().setObject('upgradeMode', true)
       }
     }
   }
