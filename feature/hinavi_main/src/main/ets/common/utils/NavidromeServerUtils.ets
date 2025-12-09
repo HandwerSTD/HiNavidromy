@@ -23,9 +23,6 @@ export class NavidromeServerUtils {
           if (val.responseCode === 200) {
             GlobalStore.serverStatus = ServerLoadStatus.SUCCESS
             QemuAgentManager.acquire()
-              .then((res) => {
-
-              })
           }
         })
     }, () => {
