@@ -4,6 +4,7 @@ import { http } from "@kit.NetworkKit";
 import { buffer } from "@kit.ArkTS";
 import { VMSwitcher } from "../../lib/VMSwitcher";
 import QemuAgentManager from "../../lib/Agent/AgentManager";
+import { GuestAgentHelper } from "../../lib/Agent/GuestAgent";
 
 export enum ServerLoadStatus {
   LOADING,
@@ -28,6 +29,23 @@ export class NavidromeServerUtils {
     }, () => {
       return !GlobalStore.isServerOnline
     }, 2000)
+  }
+  static async backupLibraryDB(): Promise<string> {
+    // 生成时间戳格式：yyyyMMdd_HHmmss
+    const now = new Date()
+    const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`
+    const backupFileName = `backup_${timestamp}.db`
+    const backupPath = `/mnt/share/${backupFileName}`
+
+    // 执行备份命令
+    const cmd = `sqlite3 /var/lib/navidrome/navidrome.db ".backup ${backupPath}"`
+    const result = await GuestAgentHelper.execWithExitCode('/root', cmd)
+
+    if (!result.success) {
+      throw new Error(`备份失败，返回码: ${result.exitCode}, 输出: ${result.output}`)
+    }
+
+    return backupPath
   }
 }
 function stringToArrayBuffer(str: string, encoding: buffer.BufferEncoding = 'utf-8'): ArrayBuffer {

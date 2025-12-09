@@ -415,4 +415,131 @@ export interface CpuStats {
   idle: number
 }
 
+/**
+ * Guest Agent 帮助类
+ * 封装常用操作，自动管理 Agent 连接的获取和释放
+ */
+export class GuestAgentHelper {
+  private static readonly USER_ID = 'HiNavi'
+
+  /**
+   * 在虚拟机内执行命令并获取输出
+   * @param cwd 工作目录，默认 '/root/'
+   * @param cmd 要执行的命令，默认 'echo Hello'
+   * @returns 命令输出字符串，失败返回空字符串
+   */
+  static async execGetOutput(cwd: string = '/root/', cmd: string = 'echo Hello'): Promise<string> {
+    // 动态导入 AgentManager 避免循环依赖
+    const QemuAgentManager = (await import('./AgentManager')).default
+
+    let agent: QemuAgent | null = null
+    try {
+      // 获取 Agent 连接
+      agent = await QemuAgentManager.acquire(GuestAgentHelper.USER_ID)
+      if (!agent) {
+        hilog.error(DOMAIN, 'GuestAgentHelper', '获取 Agent 连接失败')
+        return ''
+      }
+
+      // 构建命令：cd $cwd && $cmd
+      const fullCmd = `cd ${cwd} && ${cmd}`
+      hilog.info(DOMAIN, 'GuestAgentHelper', '执行命令: %{public}s', fullCmd)
+
+      // 使用 /bin/sh -lc 执行命令（-l 加载登录环境）
+      const output = await agent.execAndGetOutput('/bin/sh', ['-lc', fullCmd])
+
+      if (output === null) {
+        hilog.error(DOMAIN, 'GuestAgentHelper', '命令执行失败或超时')
+        return ''
+      }
+
+      return output
+    } catch (e) {
+      hilog.error(DOMAIN, 'GuestAgentHelper', '执行命令异常: %{public}s', JSON.stringify(e as ESObject))
+      return ''
+    } finally {
+    }
+  }
+
+  /**
+   * 在虚拟机内执行命令并获取输出和返回码
+   * @param cwd 工作目录，默认 '/root/'
+   * @param cmd 要执行的命令，默认 'echo Hello'
+   * @returns 包含输出和返回码的结果对象
+   */
+  static async execWithExitCode(cwd: string = '/root/', cmd: string = 'echo Hello'): Promise<ExecResult> {
+    // 动态导入 AgentManager 避免循环依赖
+    const QemuAgentManager = (await import('./AgentManager')).default
+
+    let agent: QemuAgent | null = null
+    try {
+      // 获取 Agent 连接
+      agent = await QemuAgentManager.acquire(GuestAgentHelper.USER_ID)
+      if (!agent) {
+        hilog.error(DOMAIN, 'GuestAgentHelper', '获取 Agent 连接失败')
+        return { output: '', exitCode: -1, success: false }
+      }
+
+      // 构建命令：cd $cwd && $cmd
+      const fullCmd = `cd ${cwd} && ${cmd}`
+      hilog.info(DOMAIN, 'GuestAgentHelper', '执行命令: %{public}s', fullCmd)
+
+      // 使用 /bin/sh -lc 执行命令（-l 加载登录环境）
+      const pid = await agent.exec('/bin/sh', ['-lc', fullCmd])
+      if (!pid) {
+        hilog.error(DOMAIN, 'GuestAgentHelper', '启动命令失败')
+        return { output: '', exitCode: -1, success: false }
+      }
+
+      // 等待命令执行完成并获取结果
+      for (let i = 0; i < 20; i++) {
+        await new Promise<void>((resolve: () => void) => setTimeout(resolve, 100))
+        const status: ESObject | null = await agent.execStatus(pid)
+
+        if (status && (status as Record<string, boolean>)['exited']) {
+          const exitCode = (status as Record<string, number>)['exitcode'] ?? -1
+          let output = ''
+
+          const outData = (status as Record<string, string>)['out-data']
+          if (outData) {
+            try {
+              const decoder = util.TextDecoder.create('utf-8')
+              const base64Helper = new util.Base64Helper()
+              const decoded = base64Helper.decodeSync(outData)
+              output = decoder.decodeToString(decoded)
+            } catch (e) {
+              hilog.error(DOMAIN, 'GuestAgentHelper', '解码输出失败: %{public}s', JSON.stringify(e as ESObject))
+            }
+          }
+
+          return {
+            output,
+            exitCode,
+            success: exitCode === 0
+          }
+        }
+      }
+
+      hilog.error(DOMAIN, 'GuestAgentHelper', '命令执行超时')
+      return { output: '', exitCode: -1, success: false }
+    } catch (e) {
+      hilog.error(DOMAIN, 'GuestAgentHelper', '执行命令异常: %{public}s', JSON.stringify(e as ESObject))
+      return { output: '', exitCode: -1, success: false }
+    } finally {
+    }
+  }
+}
+
+/**
+ * 命令执行结果
+ */
+export interface ExecResult {
+  /** 命令输出 */
+  output: string
+  /** 返回码，-1 表示执行失败 */
+  exitCode: number
+  /** 是否成功（exitCode === 0） */
+  success: boolean
+}
+
 export default QemuAgent

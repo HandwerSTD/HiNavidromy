@@ -1,9 +1,33 @@
 import { CommonItemContainer, CommonListItem } from '../../components/component_library/CommonListItem'
-import { VMUtils } from '../../common/utils/NavidromeServerUtils'
+import { NavidromeServerUtils, VMUtils } from '../../common/utils/NavidromeServerUtils'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 
 @ComponentV2
 export struct UsefulTerminalView {
   scroller = new Scroller()
+  backupDbProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '正在备份数据库...',
+    }),
+  })
+
+  async backupNavidromeDb() {
+    this.backupDbProgress.open()
+    try {
+      const backupPath = await NavidromeServerUtils.backupLibraryDB()
+      promptAction.showToast({
+        message: `备份成功: ${backupPath}`,
+        duration: 3000
+      })
+    } catch (e) {
+      promptAction.showToast({
+        message: `备份失败: ${(e as Error).message}`,
+        duration: 3000
+      })
+    } finally {
+      this.backupDbProgress.close()
+    }
+  }
 
   build() {
     NavDestination() {
@@ -267,6 +291,14 @@ export struct UsefulTerminalView {
               isCompose: true
             }).onClick(() => {
               VMUtils.suspendAndExecuteCommand('vi /etc/navidrome/navidrome.toml')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.externaldrive'),
+              title: '备份 Navidrome 数据库',
+              subtitle: '备份到 /mnt/share/',
+              isCompose: true
+            }).onClick(() => {
+              this.backupNavidromeDb()
             })
           }
         }

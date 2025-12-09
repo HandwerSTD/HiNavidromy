@@ -5,6 +5,7 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import appOption from 'hinavi_main/src/main/ets/model/appOption'
 import { ServiceInitUtils } from 'hinavi_main';
 import { preferences } from '@kit.ArkData';
+import { DialogHelper } from '@pura/harmony-dialog';
 
 const DOMAIN = 0x0000;
 
@@ -27,33 +28,17 @@ export default class EntryAbility extends UIAbility {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
     this.onHandleWant(want)
-    // hiAppEvent.addWatcher({
-    //   name: 'NATIVE_EXIT_WATCHER',
-    //   appEventFilters: [{
-    //     domain: hiAppEvent.domain.OS,
-    //     names: [hiAppEvent.event.APP_CRASH]
-    //   }],
-    //   onReceive: (d, g) => {
-    //     const msg = JSON.stringify(g)
-    //     console.log('fault message = ' + msg)
-    //     if (msg.includes('Unexpected call: exit(1)')) {
-    //       promptAction.showToast({
-    //         message: '正在进入恢复模式'
-    //       })
-    //       this.context.getApplicationContext().restartApp({
-    //         abilityName: 'EntryAbility',
-    //         bundleName: 'top.handwer.hish.hinavidromy',
-    //         parameters: {
-    //           "recovery": true
-    //         }
-    //       })
-    //     } else if (msg.includes('Unexpected call: exit(0)')) {
-    //       promptAction.showToast({
-    //         message: '上次正常退出'
-    //       })
-    //     }
-    //   }
-    // })
+    DialogHelper.setDefaultConfig((config) => {
+      config.uiAbilityContext = this.context;
+      config.loading_backgroundColor = $r('sys.color.background_secondary')
+      config.loading_fontColor = $r('sys.color.font_primary')
+      config.loading_loadColor = $r('sys.color.font_primary')
+      config.backgroundBlurStyle = BlurStyle.BACKGROUND_THICK
+      config.loading_borderRadius = 24
+      config.cornerRadius = 24
+      config.autoCancel = false
+      config.backCancel = false
+    })
   }
 
   onDestroy(): void {
