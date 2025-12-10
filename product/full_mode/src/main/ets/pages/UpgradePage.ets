@@ -109,7 +109,8 @@ struct UpgradePage {
     this.checkForceUpdate()
     GlobalStore.isFirstOpenFinished = true
     NavidromeServerUtils.checkConnectionOnStart()
-      .then(() => {
+      .finally(() => {
+        GlobalStore.serverStatus = ServerLoadStatus.SUCCESS
         SystemImageUtils.getStoredVersion(application.getApplicationContext())
           .then((res) => {
             if (res == 0) {
@@ -138,7 +139,7 @@ struct UpgradePage {
 
   private async waitForV0Backup() {
     const sharedHost = AppStorage.get(appOption.sharedHost) as string
-    const backupFilePath = sharedHost + '/navidrome.db'
+    const backupFilePath = sharedHost + '/hinavi_recent_backup.db'
     try {
       await RetryUtil.retryIf(40, async () => {
         const exists = fs.accessSync(backupFilePath, fs.AccessModeType.EXIST)
