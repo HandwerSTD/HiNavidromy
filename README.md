@@ -4,7 +4,7 @@
 
 ## 如何获取
 
-可以选择下面任一方法获取HiSH：
+可以选择下面任一方法获取HiNavidromy：
 
 - 从 Release 下载 app 文件，自行签名后安装到设备或模拟器（支持JIT，运行效率更高）
 - 使用DevEco Studio编译源码，参考 HiSH
