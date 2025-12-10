@@ -42,7 +42,6 @@ export class NavidromeServerUtils {
   }
   private static async afterAgentConnection() {
     if (GlobalContext.getContext().getObject('upgradeMode')) {
-      GlobalContext.getContext().setObject('upgradeMode', false)
       // 更新，恢复数据库
       const id = DialogHelper.showLoadingDialog()
       await NavidromeServerUtils.recoverBackup('/mnt/share/hinavi_recent_backup.db')

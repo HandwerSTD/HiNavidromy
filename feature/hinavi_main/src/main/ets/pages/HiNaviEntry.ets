@@ -1,8 +1,8 @@
 import { AegStrUtil } from '@hw-agconnect/petal-aegis'
 import common from '@ohos.app.ability.common'
 import preference from '@ohos.data.preferences'
-import { DialogHelper, SpinKit } from '@pura/harmony-dialog'
-import { Base64Util, GlobalContext, WantUtil } from '@pura/harmony-utils'
+import { SpinKit } from '@pura/harmony-dialog'
+import { Base64Util, WantUtil } from '@pura/harmony-utils'
 import GlobalStore from '../common/statemgmt/GlobalStore'
 import appOption from '../model/appOption'
 import { NavidromeServerUtils, ServerLoadStatus, VMUtils } from '../common/utils/NavidromeServerUtils'
@@ -19,7 +19,6 @@ import { MiscUtils } from '../common/utils/Misc'
 import { CommonConst } from '../common/constants/CommonConsts'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { MyLogUtil } from '../common/utils/Logger'
-import { promptAction } from '@kit.ArkUI'
 
 export interface NavidromeRequestContext {
   baseUrl: string; // Navidrome API 根地址
@@ -51,27 +50,6 @@ export struct HiNaviEntry {
       .catch(() => {
         GlobalStore.serverStatus = ServerLoadStatus.TIMEOUT
         this.showTimeoutDialog()
-      })
-      .finally(() => {
-        if (GlobalContext.getContext().getObject('upgradeMode')) {
-          GlobalContext.getContext().setObject('upgradeMode', false)
-          // 更新，恢复数据库
-          const id = DialogHelper.showLoadingDialog()
-          NavidromeServerUtils.recoverBackup('/mnt/share/hinavi_recent_backup.db')
-            .then(() => {
-              promptAction.showToast({
-                message: '升级数据恢复完成'
-              })
-            })
-            .catch(() => {
-              promptAction.showToast({
-                message: '数据库恢复失败'
-              })
-            })
-            .finally(() => {
-              DialogHelper.closeDialog(id)
-            })
-        }
       })
     const portUsedByOthers = AppStorage.get(appOption.portUsedByOthers) as number[]
     if (portUsedByOthers.length > 0) {
@@ -413,13 +391,6 @@ export struct HiNaviEntry {
   }
 
   showTimeoutDialog() {
-    if (GlobalContext.getContext().getObject('upgradeMode')) {
-      this.getUIContext().showAlertDialog({
-        title: '服务器连接超时',
-        message: '出现此提示说明服务器未能向外映射端口，通常为系统原因，不代表此时服务器发生损坏，请耐心等待数据恢复完成'
-      })
-      return
-    }
     this.getUIContext().showAlertDialog({
       title: '服务器连接超时',
       message: '无法连接到位于 localhost:4533 的服务器，可能有以下原因：\n' +
