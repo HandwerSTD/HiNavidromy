@@ -339,14 +339,14 @@ export struct UsefulTerminalView {
             }).onClick(() => {
               this.executeCommand('网络连接状态', 'netstat -tuln')
             })
-            CommonListItem({
-              icon: $r('sys.symbol.robot'),
-              title: '监听端口',
-              subtitle: 'ss -tuln',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('监听端口', 'ss -tuln')
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.robot'),
+            //   title: '监听端口',
+            //   subtitle: 'ss -tuln',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   this.executeCommand('监听端口', 'ss -tuln')
+            // })
           }
         }
 

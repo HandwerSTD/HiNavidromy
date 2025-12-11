@@ -4,6 +4,7 @@ import { promptAction } from '@kit.ArkUI'
 import { systemShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { common } from '@kit.AbilityKit'
+import GlobalStore from '../../common/statemgmt/GlobalStore'
 
 /**
  * 命令执行参数
@@ -18,9 +19,11 @@ export interface CommandExecuteParams {
 }
 
 /**
- * 命令历史记录项
+ * 命令历史记录项（包含完整输出）
  */
 export interface CommandHistoryItem {
+  /** 唯一ID */
+  id: string
   /** 命令 */
   command: string
   /** 标题 */
@@ -33,6 +36,10 @@ export interface CommandHistoryItem {
   exitCode: number
   /** 执行耗时(ms) */
   duration: number
+  /** 命令输出 */
+  output: string
+  /** 错误信息 */
+  errorMessage?: string
 }
 
 /**
@@ -63,12 +70,51 @@ class CommandHistoryManager {
     return [...this.history]
   }
 
+  getById(id: string): CommandHistoryItem | undefined {
+    return this.history.find(item => item.id === id)
+  }
+
   clearHistory() {
     this.history = []
   }
 }
 
 export const commandHistory = CommandHistoryManager.getInstance()
+
+/**
+ * 生成唯一ID
+ */
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 9)
+}
+
+/**
+ * 判断命令输出是否可以被解析为结构化数据
+ */
+export function canAnalyzeOutput(command: string): boolean {
+  const analyzableCommands = [
+    'ps aux', 'ps -ef', 'ps -aux',
+    'df -h', 'df -H', 'df',
+    'free -h', 'free -m', 'free',
+    'top -b -n 1', 'top -bn1',
+    'netstat -tuln', 'netstat -tulnp',
+    'ss -tuln', 'ss -tulnp',
+    'lsblk'
+  ]
+  return analyzableCommands.some(cmd => command.includes(cmd.split(' ')[0]))
+}
+
+/**
+ * 获取命令的基础名称（用于获取帮助）
+ */
+export function getBaseCommand(command: string): string {
+  // 移除 sudo 前缀
+  let cmd = command.replace(/^sudo\s+/, '')
+  // 获取第一个命令（管道前的部分）
+  cmd = cmd.split('|')[0].trim()
+  // 获取命令名（第一个单词）
+  return cmd.split(/\s+/)[0]
+}
 
 @ComponentV2
 export struct CommandExecutePage {
@@ -88,6 +134,9 @@ export struct CommandExecutePage {
 
   // 历史记录显示
   @Local showHistory: boolean = false
+
+  // 当前记录ID
+  @Local currentRecordId: string = ''
 
   aboutToAppear(): void {
     // 从路由参数获取命令信息
@@ -112,6 +161,7 @@ export struct CommandExecutePage {
     this.startTime = Date.now()
     this.endTime = 0
     this.duration = 0
+    this.currentRecordId = generateId()
 
     try {
       const cwd = this.params.cwd || '/root'
@@ -128,14 +178,17 @@ export struct CommandExecutePage {
         this.errorMessage = '命令执行失败或超时'
       }
 
-      // 添加到历史记录
+      // 添加到历史记录（包含完整输出）
       commandHistory.addRecord({
+        id: this.currentRecordId,
         command: this.params.command,
         title: this.params.title,
         executedAt: this.startTime,
         success: result.success,
         exitCode: result.exitCode,
-        duration: this.duration
+        duration: this.duration,
+        output: result.output,
+        errorMessage: this.errorMessage || undefined
       })
     } catch (e) {
       this.endTime = Date.now()
@@ -145,12 +198,15 @@ export struct CommandExecutePage {
 
       // 记录失败的历史
       commandHistory.addRecord({
+        id: this.currentRecordId,
         command: this.params!.command,
         title: this.params!.title,
         executedAt: this.startTime,
         success: false,
         exitCode: -1,
-        duration: this.duration
+        duration: this.duration,
+        output: '',
+        errorMessage: this.errorMessage
       })
     } finally {
       this.isExecuting = false
@@ -187,6 +243,41 @@ export struct CommandExecutePage {
     shareController.show(context, {
       selectionMode: systemShare.SelectionMode.SINGLE
     })
+  }
+
+  /**
+   * 跳转到输出分析页面
+   */
+  goToAnalysis() {
+    if (this.output && this.params) {
+      GlobalStore.pageStack.push('OutputAnalysis', {
+        command: this.params.command,
+        output: this.output,
+        title: this.params.title
+      } as CommandHistoryItem)
+    }
+  }
+
+  /**
+   * 跳转到命令帮助页面
+   */
+  goToHelp() {
+    if (this.params) {
+      const baseCmd = getBaseCommand(this.params.command)
+      GlobalStore.pageStack.pushPathByName('CommandHelp', {
+        command: baseCmd
+      } as CommandExecuteParams, true)
+    }
+  }
+
+  /**
+   * 跳转到历史详情页面
+   */
+  goToHistoryDetail(item: CommandHistoryItem) {
+    GlobalStore.pageStack.pushPathByName('HistoryDetail', {
+      "historyId": item.id
+    } as Record<string, Object>, true)
+    this.showHistory = false
   }
 
   /**
@@ -309,7 +400,7 @@ export struct CommandExecutePage {
           .padding(32)
       } else {
         List({ space: 8 }) {
-          ForEach(commandHistory.getHistory(), (item: CommandHistoryItem, index: number) => {
+          ForEach(commandHistory.getHistory(), (item: CommandHistoryItem) => {
             ListItem() {
               Row({ space: 12 }) {
                 // 状态图标
@@ -343,23 +434,18 @@ export struct CommandExecutePage {
                 .layoutWeight(1)
                 .alignItems(HorizontalAlign.Start)
 
-                // 重新执行按钮
-                SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-                  .fontColor([$r('sys.color.font_secondary')])
-                  .fontSize(18)
-                  .onClick(() => {
-                    this.params = {
-                      command: item.command,
-                      title: item.title
-                    }
-                    this.showHistory = false
-                    this.executeCommand()
-                  })
+                // 查看详情
+                SymbolGlyph($r('sys.symbol.chevron_right'))
+                  .fontColor([$r('sys.color.font_tertiary')])
+                  .fontSize(16)
               }
               .width('100%')
               .padding(12)
               .backgroundColor($r('sys.color.comp_background_tertiary'))
               .borderRadius(8)
+              .onClick(() => {
+                this.goToHistoryDetail(item)
+              })
             }
           })
         }
@@ -370,6 +456,38 @@ export struct CommandExecutePage {
     .width('100%')
     .height('100%')
     .padding(16)
+  }
+
+  @Builder
+  QuickActions() {
+    if (this.hasExecuted && !this.isExecuting && this.output) {
+      Row({ space: 8 }) {
+        // 数据分析按钮
+        if (canAnalyzeOutput(this.params?.command || '')) {
+          Button('数据分析')
+            .fontSize(12)
+            .height(28)
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .fontColor($r('sys.color.font'))
+            .onClick(() => {
+              this.goToAnalysis()
+            })
+        }
+
+        // 命令帮助按钮
+        Button('命令帮助')
+          .fontSize(12)
+          .height(28)
+          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .fontColor($r('sys.color.font'))
+          .onClick(() => {
+            this.goToHelp()
+          })
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.End)
+      .padding({ right: 16, bottom: 8 })
+    }
   }
 
   build() {
@@ -401,6 +519,9 @@ export struct CommandExecutePage {
 
         // 执行时间统计
         this.TimeStats()
+
+        // 快捷操作
+        this.QuickActions()
 
         // 输出区域
         Column({ space: 12 }) {

@@ -13,6 +13,9 @@ import WebTerminal from '../components/WebTerminal'
 import { NavidromeWeb } from '../hinavi/views/NavidromeWeb'
 import { UsefulTerminalView } from '../hinavi/views/UsefulTerminalView'
 import { CommandExecutePage } from '../hinavi/views/CommandExecutePage'
+import { HistoryDetailPage } from '../hinavi/views/HistoryDetailPage'
+import { OutputAnalysisPage } from '../hinavi/views/OutputAnalysisPage'
+import { CommandHelpPage } from '../hinavi/views/CommandHelpPage'
 import { FirstOpenPage } from './FirstOpenPages/FirstOpenPage'
 import { VMSwitcher } from '../lib/VMSwitcher'
 import { ServiceInitUtils } from '../../../../Index'
@@ -87,6 +90,12 @@ export struct HiNaviEntry {
       UsefulTerminalView()
     } else if (name === 'CommandExecute') {
       CommandExecutePage()
+    } else if (name === 'HistoryDetail') {
+      HistoryDetailPage()
+    } else if (name === 'OutputAnalysis') {
+      OutputAnalysisPage()
+    } else if (name === 'CommandHelp') {
+      CommandHelpPage()
     }
   }
 
