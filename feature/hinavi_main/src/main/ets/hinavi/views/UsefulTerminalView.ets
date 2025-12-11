@@ -1,6 +1,8 @@
 import { CommonItemContainer, CommonListItem } from '../../components/component_library/CommonListItem'
 import { NavidromeServerUtils, VMUtils } from '../../common/utils/NavidromeServerUtils'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import GlobalStore from '../../common/statemgmt/GlobalStore'
+import { CommandExecuteParams } from './CommandExecutePage'
 
 @ComponentV2
 export struct UsefulTerminalView {
@@ -10,6 +12,17 @@ export struct UsefulTerminalView {
       content: '正在备份数据库...',
     }),
   })
+
+  /**
+   * 执行命令并跳转到结果页面
+   */
+  executeCommand(title: string, command: string) {
+    const params: CommandExecuteParams = {
+      command: command,
+      title: title
+    }
+    GlobalStore.pageStack.pushPathByName('CommandExecute', params, true)
+  }
 
   async backupNavidromeDb() {
     this.backupDbProgress.open()
@@ -54,7 +67,7 @@ export struct UsefulTerminalView {
               subtitle: 'date',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('date')
+              this.executeCommand('查看系统时间', 'date')
             })
             CommonListItem({
               icon: $r('sys.symbol.timer'),
@@ -62,7 +75,7 @@ export struct UsefulTerminalView {
               subtitle: 'uptime',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('uptime')
+              this.executeCommand('查看系统运行时间', 'uptime')
             })
             CommonListItem({
               icon: $r('sys.symbol.info_circle'),
@@ -70,7 +83,7 @@ export struct UsefulTerminalView {
               subtitle: 'uname -a',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('uname -a')
+              this.executeCommand('系统信息', 'uname -a')
             })
           }
         }
@@ -89,15 +102,15 @@ export struct UsefulTerminalView {
               subtitle: 'ps aux',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('ps aux')
+              this.executeCommand('查看所有进程', 'ps aux')
             })
             CommonListItem({
               icon: $r('sys.symbol.monitor_fill'),
               title: '实时进程监控',
-              subtitle: 'top',
+              subtitle: 'top -b -n 1',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('top')
+              this.executeCommand('实时进程监控', 'top -b -n 1')
             })
             CommonListItem({
               icon: $r('sys.symbol.application_projection'),
@@ -126,29 +139,29 @@ export struct UsefulTerminalView {
               title: '文件操作',
               isCompose: true
             }) {}
-            CommonListItem({
-              icon: $r('sys.symbol.list_bullet'),
-              title: '详细列出文件',
-              subtitle: 'ls -lah',
-              isCompose: true
-            }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('ls -lah')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.folder'),
-              title: '当前目录路径',
-              subtitle: 'pwd',
-              isCompose: true
-            }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('pwd')
-            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.list_bullet'),
+            //   title: '详细列出文件',
+            //   subtitle: 'ls -lah',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   this.executeCommand('详细列出文件', 'ls -lah')
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.folder'),
+            //   title: '当前目录路径',
+            //   subtitle: 'pwd',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   this.executeCommand('当前目录路径', 'pwd')
+            // })
             CommonListItem({
               icon: $r('sys.symbol.archivebox'),
               title: '磁盘使用情况',
               subtitle: 'df -h',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('df -h')
+              this.executeCommand('磁盘使用情况', 'df -h')
             })
             CommonListItem({
               icon: $r('sys.symbol.hard_disk'),
@@ -156,7 +169,7 @@ export struct UsefulTerminalView {
               subtitle: 'du -sh /mnt/share/',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('du -sh /mnt/share/')
+              this.executeCommand('音乐库目录大小', 'du -sh /mnt/share/')
             })
             // CommonListItem({
             //   icon: $r('sys.symbol.magnifyingglass'),
@@ -199,7 +212,7 @@ export struct UsefulTerminalView {
               subtitle: 'ip addr',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('ip addr')
+              this.executeCommand('网络接口信息', 'ip addr')
             })
             CommonListItem({
               icon: $r('sys.symbol.dot_radiowaves_left_and_right'),
@@ -207,7 +220,7 @@ export struct UsefulTerminalView {
               subtitle: 'ping -c 4 www.baidu.com',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('ping -c 4 www.baidu.com')
+              this.executeCommand('Ping 测试网络', 'ping -c 4 www.baidu.com')
             })
             CommonListItem({
               icon: $r('sys.symbol.arrow_clockwise'),
@@ -215,7 +228,7 @@ export struct UsefulTerminalView {
               subtitle: 'netstat -tuln',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('netstat -tuln')
+              this.executeCommand('网络连接状态', 'netstat -tuln')
             })
             CommonListItem({
               icon: $r('sys.symbol.robot'),
@@ -223,7 +236,7 @@ export struct UsefulTerminalView {
               subtitle: 'ss -tuln',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('ss -tuln')
+              this.executeCommand('监听端口', 'ss -tuln')
             })
           }
         }
@@ -242,7 +255,7 @@ export struct UsefulTerminalView {
               subtitle: 'rc-status -a',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('rc-status -a')
+              this.executeCommand('查看所有服务', 'rc-status -a')
             })
             CommonListItem({
               icon: $r('sys.symbol.play_fill'),
@@ -250,7 +263,7 @@ export struct UsefulTerminalView {
               subtitle: 'rc-service navidrome start',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('rc-service navidrome start')
+              this.executeCommand('启动 Navidrome 服务', 'rc-service navidrome start')
             })
             CommonListItem({
               icon: $r('sys.symbol.stop_circle'),
@@ -258,7 +271,7 @@ export struct UsefulTerminalView {
               subtitle: 'rc-service navidrome stop',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('rc-service navidrome stop')
+              this.executeCommand('停止 Navidrome 服务', 'rc-service navidrome stop')
             })
             CommonListItem({
               icon: $r('sys.symbol.arrow_clockwise'),
@@ -266,7 +279,7 @@ export struct UsefulTerminalView {
               subtitle: 'rc-service navidrome restart',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('rc-service navidrome restart')
+              this.executeCommand('重启 Navidrome 服务', 'rc-service navidrome restart')
             })
             CommonListItem({
               icon: $r('sys.symbol.checkmark_circle'),
@@ -274,7 +287,7 @@ export struct UsefulTerminalView {
               subtitle: 'rc-service navidrome status',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('rc-service navidrome status')
+              this.executeCommand('查看服务状态', 'rc-service navidrome status')
             })
             CommonListItem({
               icon: $r('sys.symbol.list_checkmask'),
@@ -282,16 +295,9 @@ export struct UsefulTerminalView {
               subtitle: 'cat /etc/navidrome/navidrome.toml',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('cat /etc/navidrome/navidrome.toml')
+              this.executeCommand('查看 Navidrome 配置文件', 'cat /etc/navidrome/navidrome.toml')
             })
-            CommonListItem({
-              icon: $r('sys.symbol.list_checkmask'),
-              title: '编辑 Navidrome 配置文件(按[ESC], [:q]或[:wq], [ENTER])退出',
-              subtitle: 'vi /etc/navidrome/navidrome.toml',
-              isCompose: true
-            }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('vi /etc/navidrome/navidrome.toml')
-            })
+            // 编辑配置文件功能已移除（QGA 不支持交互式编辑）
             CommonListItem({
               icon: $r('sys.symbol.externaldrive'),
               title: '备份 Navidrome 数据库',
@@ -317,15 +323,15 @@ export struct UsefulTerminalView {
               subtitle: 'tail /var/log/navidrome.log',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('tail /var/log/navidrome.log')
+              this.executeCommand('Navidrome 日志', 'tail -n 50 /var/log/navidrome.log')
             })
             CommonListItem({
               icon: $r('sys.symbol.clock_arrow_2_circlepath'),
-              title: '实时查看日志（Ctrl+C退出）',
-              subtitle: 'tail -f /var/log/navidrome.log',
+              title: '查看最新日志（100行）',
+              subtitle: 'tail -n 100 /var/log/navidrome.log',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('tail -f /var/log/navidrome.log')
+              this.executeCommand('Navidrome 最新日志', 'tail -n 100 /var/log/navidrome.log')
             })
             // CommonListItem({
             //   icon: $r('sys.symbol.doc_text'),
@@ -409,7 +415,7 @@ export struct UsefulTerminalView {
               subtitle: 'apk update',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('apk update')
+              this.executeCommand('更新软件源', 'apk update')
             })
             CommonListItem({
               icon: $r('sys.symbol.arrow_up_circle'),
@@ -417,7 +423,7 @@ export struct UsefulTerminalView {
               subtitle: 'apk upgrade',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('apk upgrade')
+              this.executeCommand('升级软件包', 'apk upgrade')
             })
             // CommonListItem({
             //   icon: $r('sys.symbol.download_1'),
@@ -468,7 +474,7 @@ export struct UsefulTerminalView {
               subtitle: 'free -h',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('free -h')
+              this.executeCommand('内存使用情况', 'free -h')
             })
             CommonListItem({
               icon: $r('sys.symbol.strolling_machine'),
@@ -476,15 +482,7 @@ export struct UsefulTerminalView {
               subtitle: 'cat /proc/cpuinfo',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('cat /proc/cpuinfo')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.externaldrive_3'),
-              title: '磁盘信息',
-              subtitle: 'lsblk',
-              isCompose: true
-            }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('lsblk')
+              this.executeCommand('CPU 信息', 'cat /proc/cpuinfo')
             })
             CommonListItem({
               icon: $r('sys.symbol.average_speed'),
@@ -492,7 +490,7 @@ export struct UsefulTerminalView {
               subtitle: 'iostat',
               isCompose: true
             }).onClick(() => {
-              VMUtils.suspendAndExecuteCommand('iostat')
+              this.executeCommand('I/O 统计', 'iostat')
             })
             // CommonListItem({
             //   icon: $r('sys.symbol.shock_load_rate_fill'),

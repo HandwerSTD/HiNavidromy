@@ -12,6 +12,7 @@ import { SharedFolderContent } from '../components/SharedFolderContent'
 import WebTerminal from '../components/WebTerminal'
 import { NavidromeWeb } from '../hinavi/views/NavidromeWeb'
 import { UsefulTerminalView } from '../hinavi/views/UsefulTerminalView'
+import { CommandExecutePage } from '../hinavi/views/CommandExecutePage'
 import { FirstOpenPage } from './FirstOpenPages/FirstOpenPage'
 import { VMSwitcher } from '../lib/VMSwitcher'
 import { ServiceInitUtils } from '../../../../Index'
@@ -84,6 +85,8 @@ export struct HiNaviEntry {
       }.title('应用设置')
     } else if (name === 'CommonCommands') {
       UsefulTerminalView()
+    } else if (name === 'CommandExecute') {
+      CommandExecutePage()
     }
   }
 
