@@ -45,6 +45,115 @@ export struct UsefulTerminalView {
   build() {
     NavDestination() {
       List({ space: 12, scroller: this.scroller }) {
+        // 服务管理
+        ListItem() {
+          CommonItemContainer() {
+            CommonListItem({
+              // icon: $r('sys.symbol.service'),
+              title: '服务管理',
+              isCompose: true
+            }) {}
+            CommonListItem({
+              icon: $r('sys.symbol.star_badge_list'),
+              title: '查看所有服务',
+              subtitle: 'rc-status -a',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('查看所有服务', 'rc-status -a')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.play_fill'),
+              title: '启动 Navidrome 服务',
+              subtitle: 'rc-service navidrome start',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('启动 Navidrome 服务', 'rc-service navidrome start')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.stop_circle'),
+              title: '停止 Navidrome 服务',
+              subtitle: 'rc-service navidrome stop',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('停止 Navidrome 服务', 'rc-service navidrome stop')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.arrow_clockwise'),
+              title: '重启 Navidrome 服务',
+              subtitle: 'rc-service navidrome restart',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('重启 Navidrome 服务', 'rc-service navidrome restart')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.checkmark_circle'),
+              title: '查看服务状态',
+              subtitle: 'rc-service navidrome status',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('查看服务状态', 'rc-service navidrome status')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.list_checkmask'),
+              title: '查看 Navidrome 配置文件',
+              subtitle: 'cat /etc/navidrome/navidrome.toml',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('查看 Navidrome 配置文件', 'cat /etc/navidrome/navidrome.toml')
+            })
+            // 编辑配置文件功能已移除（QGA 不支持交互式编辑）
+            CommonListItem({
+              icon: $r('sys.symbol.externaldrive'),
+              title: '备份 Navidrome 数据库',
+              subtitle: '备份到 /mnt/share/',
+              isCompose: true
+            }).onClick(() => {
+              this.backupNavidromeDb()
+            })
+          }
+        }
+        // 日志查看
+        ListItem() {
+          CommonItemContainer() {
+            CommonListItem({
+              // icon: $r('sys.symbol.doc_text'),
+              title: '日志查看',
+              isCompose: true
+            }) {}
+            CommonListItem({
+              icon: $r('sys.symbol.book'),
+              title: 'Navidrome 日志',
+              subtitle: 'tail /var/log/navidrome.log',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('Navidrome 日志', 'tail -n 50 /var/log/navidrome.log')
+            })
+            CommonListItem({
+              icon: $r('sys.symbol.clock_arrow_2_circlepath'),
+              title: '查看最新日志（100行）',
+              subtitle: 'tail -n 100 /var/log/navidrome.log',
+              isCompose: true
+            }).onClick(() => {
+              this.executeCommand('Navidrome 最新日志', 'tail -n 100 /var/log/navidrome.log')
+            })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.doc_text'),
+            //   title: '查看文件末尾',
+            //   subtitle: 'tail -f [文件]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+            // CommonListItem({
+            //   icon: $r('sys.symbol.doc_plaintext'),
+            //   title: '查看文件开头',
+            //   subtitle: 'head -n 20 [文件]',
+            //   isCompose: true
+            // }).onClick(() => {
+            //   // 这个命令需要用户输入参数，保留空实现
+            // })
+          }
+        }
         // 系统管理
         ListItem() {
           CommonItemContainer() {
@@ -238,117 +347,6 @@ export struct UsefulTerminalView {
             }).onClick(() => {
               this.executeCommand('监听端口', 'ss -tuln')
             })
-          }
-        }
-
-        // 服务管理
-        ListItem() {
-          CommonItemContainer() {
-            CommonListItem({
-              // icon: $r('sys.symbol.service'),
-              title: '服务管理',
-              isCompose: true
-            }) {}
-            CommonListItem({
-              icon: $r('sys.symbol.star_badge_list'),
-              title: '查看所有服务',
-              subtitle: 'rc-status -a',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('查看所有服务', 'rc-status -a')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.play_fill'),
-              title: '启动 Navidrome 服务',
-              subtitle: 'rc-service navidrome start',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('启动 Navidrome 服务', 'rc-service navidrome start')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.stop_circle'),
-              title: '停止 Navidrome 服务',
-              subtitle: 'rc-service navidrome stop',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('停止 Navidrome 服务', 'rc-service navidrome stop')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.arrow_clockwise'),
-              title: '重启 Navidrome 服务',
-              subtitle: 'rc-service navidrome restart',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('重启 Navidrome 服务', 'rc-service navidrome restart')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.checkmark_circle'),
-              title: '查看服务状态',
-              subtitle: 'rc-service navidrome status',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('查看服务状态', 'rc-service navidrome status')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.list_checkmask'),
-              title: '查看 Navidrome 配置文件',
-              subtitle: 'cat /etc/navidrome/navidrome.toml',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('查看 Navidrome 配置文件', 'cat /etc/navidrome/navidrome.toml')
-            })
-            // 编辑配置文件功能已移除（QGA 不支持交互式编辑）
-            CommonListItem({
-              icon: $r('sys.symbol.externaldrive'),
-              title: '备份 Navidrome 数据库',
-              subtitle: '备份到 /mnt/share/',
-              isCompose: true
-            }).onClick(() => {
-              this.backupNavidromeDb()
-            })
-          }
-        }
-
-        // 日志查看
-        ListItem() {
-          CommonItemContainer() {
-            CommonListItem({
-              // icon: $r('sys.symbol.doc_text'),
-              title: '日志查看',
-              isCompose: true
-            }) {}
-            CommonListItem({
-              icon: $r('sys.symbol.book'),
-              title: 'Navidrome 日志',
-              subtitle: 'tail /var/log/navidrome.log',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('Navidrome 日志', 'tail -n 50 /var/log/navidrome.log')
-            })
-            CommonListItem({
-              icon: $r('sys.symbol.clock_arrow_2_circlepath'),
-              title: '查看最新日志（100行）',
-              subtitle: 'tail -n 100 /var/log/navidrome.log',
-              isCompose: true
-            }).onClick(() => {
-              this.executeCommand('Navidrome 最新日志', 'tail -n 100 /var/log/navidrome.log')
-            })
-            // CommonListItem({
-            //   icon: $r('sys.symbol.doc_text'),
-            //   title: '查看文件末尾',
-            //   subtitle: 'tail -f [文件]',
-            //   isCompose: true
-            // }).onClick(() => {
-            //   // 这个命令需要用户输入参数，保留空实现
-            // })
-            // CommonListItem({
-            //   icon: $r('sys.symbol.doc_plaintext'),
-            //   title: '查看文件开头',
-            //   subtitle: 'head -n 20 [文件]',
-            //   isCompose: true
-            // }).onClick(() => {
-            //   // 这个命令需要用户输入参数，保留空实现
-            // })
           }
         }
 
