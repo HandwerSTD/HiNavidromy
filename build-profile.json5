@@ -67,15 +67,7 @@
     },
     {
       "name": "tci",
-      "srcPath": "./common/tci",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./common/tci"
     },
     {
       "name": "hinavi_main",
