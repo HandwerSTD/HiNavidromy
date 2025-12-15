@@ -86,6 +86,9 @@ class ServiceInitUtils {
           preference.getPreferences(context, appOption.preferenceName)
             .then((pref) => {
               return pref.put(appOption.simulateBg, true)
+                .then(() => {
+                  pref.flushSync()
+                })
             })
           AppStorage.set(appOption.simulateBg, true)
           GlobalStore.simulateBg = true
