@@ -334,7 +334,7 @@ export default struct SettingsContent {
       Row({space: 12}) {
         Image($r('app.media.startIcon'))
           .width(50).borderRadius(12)
-        Text('HiNavidromy\n口袋里的专业音乐管理器')
+        Text('HiNavidromy\n口袋里的专业音乐管理器\nPowered by HiSH')
       }
 
       Text(`${this.bundleInfo?.versionName}(${this.bundleInfo?.versionCode})`)
